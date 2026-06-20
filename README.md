@@ -4,6 +4,22 @@
 
 ---
 
+## Screenshots
+
+### Interview Question
+
+![Question Screen](./screenshots/question-screen.png)
+
+### AI Evaluation
+
+![Evaluation Screen](./screenshots/evaluation-screen.png)
+
+### Follow-up Question
+
+![Follow-up Question](./screenshots/follow-up-question.png)
+
+---
+
 ## Overview
 
 Many developers understand technical concepts but struggle to explain them clearly during interviews.
