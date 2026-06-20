@@ -21,15 +21,15 @@ const scoreColor = (score: number) =>
   score >= 80
     ? "text-emerald-600"
     : score >= 65
-      ? "text-amber-600"
-      : "text-red-500";
+    ? "text-amber-600"
+    : "text-red-500";
 
 const scoreBg = (score: number) =>
   score >= 80
     ? "bg-emerald-50 ring-emerald-200"
     : score >= 65
-      ? "bg-amber-50 ring-amber-200"
-      : "bg-red-50 ring-red-200";
+    ? "bg-amber-50 ring-amber-200"
+    : "bg-red-50 ring-red-200";
 
 // ── Reusable header bar ────────────────────────────────────────────────────
 
@@ -93,7 +93,9 @@ const PracticeSession = () => {
       setPhase("evaluating");
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Something went wrong. Please try again.";
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.";
       setErrorMessage(message);
       setPhase("error");
     }
@@ -135,7 +137,10 @@ const PracticeSession = () => {
   if (phase === "answering") {
     return (
       <Card>
-        <HeaderBar questionNumber={questionNumber} totalQuestions={totalQuestions} />
+        <HeaderBar
+          questionNumber={questionNumber}
+          totalQuestions={totalQuestions}
+        />
 
         <div className="px-6 py-8 sm:px-8 lg:px-10">
           <h1 className="text-2xl font-bold leading-relaxed text-gray-900">
@@ -184,7 +189,10 @@ const PracticeSession = () => {
   if (phase === "loading") {
     return (
       <Card>
-        <HeaderBar questionNumber={questionNumber} totalQuestions={totalQuestions} />
+        <HeaderBar
+          questionNumber={questionNumber}
+          totalQuestions={totalQuestions}
+        />
 
         <div className="flex flex-col items-center px-6 py-20 sm:px-8 lg:px-10">
           <div className="flex items-center justify-center">
@@ -206,7 +214,10 @@ const PracticeSession = () => {
   if (phase === "error") {
     return (
       <Card>
-        <HeaderBar questionNumber={questionNumber} totalQuestions={totalQuestions} />
+        <HeaderBar
+          questionNumber={questionNumber}
+          totalQuestions={totalQuestions}
+        />
 
         <div className="flex flex-col items-center px-6 py-20 sm:px-8 lg:px-10">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
@@ -274,8 +285,8 @@ const PracticeSession = () => {
             Interview Complete
           </h1>
           <p className="mt-3 text-base leading-relaxed text-gray-500">
-            You've answered all {totalQuestions} questions. Great work practicing
-            your technical communication skills.
+            You've answered all {totalQuestions} questions. Great work
+            practicing your technical communication skills.
           </p>
           <div className="mt-10">
             <button
@@ -298,7 +309,10 @@ const PracticeSession = () => {
 
   return (
     <Card>
-      <HeaderBar questionNumber={questionNumber} totalQuestions={totalQuestions} />
+      <HeaderBar
+        questionNumber={questionNumber}
+        totalQuestions={totalQuestions}
+      />
 
       <div className="px-6 py-8 sm:px-8 lg:px-10">
         {/* Question — de-emphasized */}
@@ -314,37 +328,55 @@ const PracticeSession = () => {
         {/* Score cards — 4-column responsive grid */}
         <div className="mb-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div
-            className={`rounded-xl px-5 py-6 ring-1 ring-inset ${scoreBg(e.overallScore)}`}
+            className={`rounded-xl px-5 py-6 ring-1 ring-inset ${scoreBg(
+              e.overallScore * 10
+            )}`}
           >
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
               Overall
             </p>
-            <p className={`mt-1 text-3xl font-bold ${scoreColor(e.overallScore)}`}>
-              {e.overallScore}%
+            <p
+              className={`mt-1 text-3xl font-bold ${scoreColor(
+                e.overallScore * 10
+              )}`}
+            >
+              {e.overallScore * 10}%
             </p>
           </div>
           <div className="rounded-xl bg-gray-50/80 px-5 py-6 ring-1 ring-inset ring-gray-100">
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
               Accuracy
             </p>
-            <p className={`mt-1 text-3xl font-bold ${scoreColor(e.technicalAccuracy)}`}>
-              {e.technicalAccuracy}%
+            <p
+              className={`mt-1 text-3xl font-bold ${scoreColor(
+                e.technicalAccuracy * 10
+              )}`}
+            >
+              {e.technicalAccuracy * 10}%
             </p>
           </div>
           <div className="rounded-xl bg-gray-50/80 px-5 py-6 ring-1 ring-inset ring-gray-100">
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
               Complete
             </p>
-            <p className={`mt-1 text-3xl font-bold ${scoreColor(e.completeness)}`}>
-              {e.completeness}%
+            <p
+              className={`mt-1 text-3xl font-bold ${scoreColor(
+                e.completeness * 10
+              )}`}
+            >
+              {e.completeness * 10}%
             </p>
           </div>
           <div className="rounded-xl bg-gray-50/80 px-5 py-6 ring-1 ring-inset ring-gray-100">
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
               Communication
             </p>
-            <p className={`mt-1 text-3xl font-bold ${scoreColor(e.communication)}`}>
-              {e.communication}%
+            <p
+              className={`mt-1 text-3xl font-bold ${scoreColor(
+                e.communication * 10
+              )}`}
+            >
+              {e.communication * 10}%
             </p>
           </div>
         </div>

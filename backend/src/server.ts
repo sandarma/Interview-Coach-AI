@@ -2,8 +2,9 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { evaluateRouter } from "./routes/evaluate.js";
+import { questionRouter } from "./routes/question.js";
 
-dotenv.config();
+dotenv.config({ override: true });
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -14,6 +15,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api", evaluateRouter);
+app.use("/api", questionRouter);
 
 // Health check
 app.get("/api/health", (_req, res) => {

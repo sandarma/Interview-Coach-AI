@@ -1,7 +1,9 @@
 import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import Anthropic from "@anthropic-ai/sdk";
+import dotenv from "dotenv";
+
+dotenv.config({ override: true });
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -35,7 +37,6 @@ interface RawClaudeResponse {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Path from backend/src/services/ → project root .claude/skills/evaluate-answer/SKILL.md
 const SKILL_PATH = join(
   __dirname,
   "..",
@@ -44,10 +45,12 @@ const SKILL_PATH = join(
   ".claude",
   "skills",
   "evaluate-answer",
-  "SKILL.md"
+  "SKILL.md",
 );
 
 const SYSTEM_PROMPT = loadSkillFile();
+const API_URL = "https://api.anthropic.com/v1/messages";
+const MODEL = "claude-sonnet-4-6";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -57,7 +60,7 @@ function loadSkillFile(): string {
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     throw new Error(
-      `Failed to load evaluation skill file from ${SKILL_PATH}: ${message}`
+      `Failed to load evaluation skill file from ${SKILL_PATH}: ${message}`,
     );
   }
 }
@@ -65,7 +68,7 @@ function loadSkillFile(): string {
 function buildUserMessage(
   question: string,
   answer: string,
-  notes?: string
+  notes?: string,
 ): string {
   const parts = ["## Question", question, "", "## User Answer", answer];
 
@@ -76,16 +79,16 @@ function buildUserMessage(
   return parts.join("\n");
 }
 
-function getClient(): Anthropic {
-  const apiKey = process.env.CLAUDE_API_KEY;
+function getApiKey(): string {
+  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
 
   if (!apiKey || apiKey === "your-api-key-here") {
     throw new Error(
-      "CLAUDE_API_KEY is not set. Add your Anthropic API key to backend/.env."
+      "ANTHROPIC_API_KEY is not set. Add your Anthropic API key to backend/.env.",
     );
   }
 
-  return new Anthropic({ apiKey });
+  return apiKey;
 }
 
 // ── Schema validation ─────────────────────────────────────────────────────
@@ -118,7 +121,7 @@ function validateResponse(raw: unknown): RawClaudeResponse {
   for (const field of REQUIRED_STRING_FIELDS) {
     if (typeof obj[field] !== "string") {
       throw new Error(
-        `Missing or invalid field in Claude response: "${field}" must be a string.`
+        `Missing or invalid field in Claude response: "${field}" must be a string.`,
       );
     }
   }
@@ -126,7 +129,7 @@ function validateResponse(raw: unknown): RawClaudeResponse {
   for (const field of REQUIRED_NUMBER_FIELDS) {
     if (typeof obj[field] !== "number") {
       throw new Error(
-        `Missing or invalid field in Claude response: "${field}" must be a number.`
+        `Missing or invalid field in Claude response: "${field}" must be a number.`,
       );
     }
   }
@@ -134,14 +137,13 @@ function validateResponse(raw: unknown): RawClaudeResponse {
   for (const field of REQUIRED_ARRAY_FIELDS) {
     if (!Array.isArray(obj[field])) {
       throw new Error(
-        `Missing or invalid field in Claude response: "${field}" must be an array.`
+        `Missing or invalid field in Claude response: "${field}" must be an array.`,
       );
     }
-    // Ensure all items are strings
     for (const item of obj[field] as unknown[]) {
       if (typeof item !== "string") {
         throw new Error(
-          `Invalid item in "${field}": every entry must be a string.`
+          `Invalid item in "${field}": every entry must be a string.`,
         );
       }
     }
@@ -155,15 +157,19 @@ function validateResponse(raw: unknown): RawClaudeResponse {
 export async function evaluateAnswer(
   question: string,
   answer: string,
-  notes?: string
+  notes?: string,
 ): Promise<EvaluationResult> {
-  const client = getClient();
+  const apiKey = getApiKey();
 
-  let rawResponse;
-
-  try {
-    const message = await client.messages.create({
-      model: "claude-sonnet-4-6-20250514",
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: MODEL,
       max_tokens: 2048,
       temperature: 0.4,
       system: SYSTEM_PROMPT,
@@ -173,30 +179,33 @@ export async function evaluateAnswer(
           content: buildUserMessage(question, answer, notes),
         },
       ],
-    });
+    }),
+  });
 
-    // Extract the text content from the response
-    const textBlocks = message.content.filter(
-      (block): block is Anthropic.TextBlock => block.type === "text"
+  if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    throw new Error(
+      `Claude API error (${response.status}): ${body || response.statusText}`,
     );
-
-    if (textBlocks.length === 0) {
-      throw new Error("Claude returned no text content in the response.");
-    }
-
-    rawResponse = textBlocks.map((b) => b.text).join("");
-  } catch (err) {
-    // Re-throw API-level errors with context
-    if (err instanceof Anthropic.APIError) {
-      throw new Error(`Claude API error (${err.status}): ${err.message}`);
-    }
-    throw err;
   }
+
+  const message = (await response.json()) as {
+    content: { type: string; text: string }[];
+  };
+
+  const textBlocks = message.content.filter(
+    (block) => block.type === "text",
+  );
+
+  if (textBlocks.length === 0) {
+    throw new Error("Claude returned no text content in the response.");
+  }
+
+  const rawResponse = textBlocks.map((b) => b.text).join("");
 
   // Parse the JSON from Claude's response
   let parsed: unknown;
   try {
-    // Strip markdown code fences if present
     const cleaned = rawResponse
       .replace(/^```(?:json)?\s*/i, "")
       .replace(/\s*```$/i, "")
@@ -205,7 +214,7 @@ export async function evaluateAnswer(
     parsed = JSON.parse(cleaned);
   } catch {
     throw new Error(
-      "Claude returned a response that could not be parsed as JSON. The model may have returned unexpected output."
+      "Claude returned a response that could not be parsed as JSON. The model may have returned unexpected output.",
     );
   }
 
@@ -220,7 +229,7 @@ export async function evaluateAnswer(
     communication: validated.communication,
     strengths: validated.strengths,
     missingConcepts: validated.missingConcepts,
-    coachingFeedback: validated.feedback, // rename feedback → coachingFeedback
+    coachingFeedback: validated.feedback,
     improvedAnswer: validated.improvedAnswer,
     followUpQuestion: validated.followUpQuestion,
   };

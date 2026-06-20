@@ -15,7 +15,12 @@
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('overallScore:', d['overallScore']\\); print\\('OK'\\)\")",
       "Bash(pkill -f \"tsx watch src/server.ts\")",
       "Bash(npm run *)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(grep -c \"^---$\" /Users/sandarminaye/Documents/CodeWithSandar/my-personal-git-repos/interview-coach/presentation.md)",
+      "Bash(pkill -f \"vite\")",
+      "Bash(pkill -f \"tsx watch\")",
+      "Bash(python3 -c ' *)",
+      "Bash(node *)"
     ]
   },
   "enableAllProjectMcpServers": true,
