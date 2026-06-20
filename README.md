@@ -341,7 +341,7 @@ useEffect is used when component renders.
 #### Interview Score
 
 ```text
-6/10
+60%
 ```
 
 #### Improved Answer
@@ -385,8 +385,6 @@ The MVP is successful if a user can:
 ## Author
 
 **Sandar Min Aye**
-
-Master of Computer & Information Sciences
-Auckland University of Technology (AUT)
+[Visit LinkedIn](https://www.linkedin.com/in/sandar-min-aye/)
 
 Building practical AI tools to improve technical interview confidence and learning effectiveness.
