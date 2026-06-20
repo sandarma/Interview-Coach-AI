@@ -1,54 +1,6 @@
-// ── Mock question bank ─────────────────────────────────────────────────────
-// TODO: Replace with Google Sheets MCP retrieval when integration is complete.
+import { google } from "googleapis";
 
-interface TopicQuestions {
-  [topic: string]: string[];
-}
-
-const QUESTION_BANK: TopicQuestions = {
-  React: [
-    "What is useEffect and when would you use it?",
-    "What is the Virtual DOM?",
-    "What is the difference between props and state?",
-    "What is useMemo?",
-    "What is a React Hook?",
-    "What is the purpose of useCallback?",
-    "How does React handle reconciliation?",
-    "What is the Context API and when would you use it?",
-    "What is the difference between controlled and uncontrolled components?",
-    "What are React Fragments and why would you use them?",
-  ],
-  JavaScript: [
-    "What is a closure and how does it work?",
-    "What is the difference between == and ===?",
-    "Explain the event loop in JavaScript.",
-    "What is hoisting?",
-    "What is the difference between var, let, and const?",
-  ],
-  TypeScript: [
-    "What is the difference between an interface and a type alias?",
-    "What are generics and when would you use them?",
-    "What is type narrowing?",
-    "What is the unknown type and how does it differ from any?",
-    "What are utility types like Partial and Pick?",
-  ],
-  APIs: [
-    "What is REST and what are its key principles?",
-    "What is the difference between GET and POST?",
-    "What are HTTP status codes and what do the 4xx and 5xx ranges mean?",
-    "What is CORS and why does it exist?",
-    "What is the difference between authentication and authorization?",
-  ],
-  Databases: [
-    "What is the difference between SQL and NoSQL databases?",
-    "What is database normalization?",
-    "What is an index and how does it improve query performance?",
-    "What are ACID properties?",
-    "What is the difference between INNER JOIN and LEFT JOIN?",
-  ],
-};
-
-// ── Public API ─────────────────────────────────────────────────────────────
+// ── Types ──────────────────────────────────────────────────────────────────
 
 export interface QuestionResponse {
   question: string;
@@ -60,16 +12,98 @@ export interface QuestionError {
   error: string;
 }
 
-export function getQuestion(
+// ── Google Sheets client ───────────────────────────────────────────────────
+
+const SHEET_ID = process.env.GOOGLE_SHEET_ID;
+const CLIENT_EMAIL = process.env.CLIENT_SERVICE_ACCOUNT_EMAIL;
+const PRIVATE_KEY = (process.env.CLIENT_SERVICE_ACCOUNT_KEY || "").replace(
+  /\\n/g,
+  "\n",
+);
+
+const TOPICS = ["React", "JavaScript", "TypeScript", "APIs", "Databases"];
+
+const auth = new google.auth.GoogleAuth({
+  credentials: {
+    client_email: CLIENT_EMAIL,
+    private_key: PRIVATE_KEY,
+  },
+  scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
+});
+
+const sheets = google.sheets({ version: "v4", auth });
+
+// ── In-memory cache ───────────────────────────────────────────────────────
+
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
+interface CacheEntry {
+  questions: string[];
+  loadedAt: number;
+}
+
+const cache: Map<string, CacheEntry> = new Map();
+
+function isFresh(entry: CacheEntry): boolean {
+  return Date.now() - entry.loadedAt < CACHE_TTL_MS;
+}
+
+// ── Sheet reader ───────────────────────────────────────────────────────────
+
+async function fetchQuestionsForTopic(topic: string): Promise<string[]> {
+  // Read column B (Question) from row 2 onward, skipping the header
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID!,
+    range: `'${topic}'!B2:B`,
+  });
+
+  const rows = res.data.values ?? [];
+
+  // Flatten, trim, and filter out empty rows
+  return rows
+    .map((row) => (row[0] as string | undefined)?.trim())
+    .filter((q): q is string => q !== undefined && q.length > 0);
+}
+
+async function loadQuestions(topic: string): Promise<string[]> {
+  const cached = cache.get(topic);
+  if (cached && isFresh(cached)) {
+    return cached.questions;
+  }
+
+  const questions = await fetchQuestionsForTopic(topic);
+  cache.set(topic, { questions, loadedAt: Date.now() });
+  return questions;
+}
+
+// ── Public API ─────────────────────────────────────────────────────────────
+
+export async function getQuestion(
   topic: string,
   questionIndex: number,
-): QuestionResponse | QuestionError {
-  const questions = QUESTION_BANK[topic];
-
-  if (!questions) {
+): Promise<QuestionResponse | QuestionError> {
+  if (!TOPICS.includes(topic)) {
     return {
-      error: `Topic "${topic}" not found. Available topics: ${Object.keys(QUESTION_BANK).join(", ")}`,
+      error: `Topic "${topic}" not found. Available topics: ${TOPICS.join(", ")}`,
     };
+  }
+
+  if (!SHEET_ID || !CLIENT_EMAIL || !PRIVATE_KEY) {
+    return {
+      error: "Google Sheets credentials are not configured.",
+    };
+  }
+
+  let questions: string[];
+  try {
+    questions = await loadQuestions(topic);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: `Failed to load questions for "${topic}": ${message}` };
+  }
+
+  if (questions.length === 0) {
+    return { error: `No questions found for topic "${topic}".` };
   }
 
   if (questionIndex < 0 || questionIndex >= questions.length) {
@@ -86,5 +120,5 @@ export function getQuestion(
 }
 
 export function getTopics(): string[] {
-  return Object.keys(QUESTION_BANK);
+  return TOPICS;
 }

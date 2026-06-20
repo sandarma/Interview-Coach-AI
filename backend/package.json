@@ -12,7 +12,8 @@
     "@anthropic-ai/sdk": "^0.105.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "googleapis": "^173.0.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

@@ -19,7 +19,7 @@ questionRouter.post("/question", async (req: Request, res: Response) => {
       return;
     }
 
-    const result = getQuestion(topic, questionIndex);
+    const result = await getQuestion(topic, questionIndex);
 
     if ("error" in result) {
       res.status(400).json(result);

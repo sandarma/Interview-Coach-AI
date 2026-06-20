@@ -1,15 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { evaluateAnswer, type EvaluationResult } from "../services/api";
-
-// ── Question bank ──────────────────────────────────────────────────────────
-
-const QUESTIONS = [
-  "What is useEffect and when would you use it?",
-  "What is the Virtual DOM?",
-  "What is the difference between props and state?",
-  "What is useMemo?",
-  "What is a React Hook?",
-];
+import { fetchQuestion } from "../services/questionApi";
 
 const TOPIC = "React";
 
@@ -72,14 +63,46 @@ const Card = ({ children }: { children: React.ReactNode }) => (
 
 const PracticeSession = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState("");
+  const [totalQuestions, setTotalQuestions] = useState(0);
+  const [isLoadingQuestion, setIsLoadingQuestion] = useState(true);
+  const [questionError, setQuestionError] = useState("");
   const [answer, setAnswer] = useState("");
   const [phase, setPhase] = useState<Phase>("answering");
   const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const currentQuestion = QUESTIONS[currentQuestionIndex];
-  const totalQuestions = QUESTIONS.length;
   const questionNumber = currentQuestionIndex + 1;
+
+  // ── Load question from API ───────────────────────────────────────────────
+
+  const loadQuestion = async (index: number) => {
+    setIsLoadingQuestion(true);
+    setQuestionError("");
+
+    try {
+      const result = await fetchQuestion(TOPIC, index);
+      setCurrentQuestion(result.question);
+      setTotalQuestions(result.totalQuestions);
+      setCurrentQuestionIndex(result.questionNumber - 1);
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Failed to load question. Please try again.";
+      setQuestionError(message);
+    } finally {
+      setIsLoadingQuestion(false);
+    }
+  };
+
+  // ── Fetch first question on mount ────────────────────────────────────────
+
+  useEffect(() => {
+    loadQuestion(0);
+  }, []);
+
+  // ── Handlers ─────────────────────────────────────────────────────────────
 
   const handleSubmit = async () => {
     if (answer.trim().length === 0) return;
@@ -107,30 +130,100 @@ const PracticeSession = () => {
     setPhase("answering");
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     const nextIndex = currentQuestionIndex + 1;
-    if (nextIndex >= QUESTIONS.length) {
+    if (nextIndex >= totalQuestions) {
       setPhase("complete");
     } else {
-      setCurrentQuestionIndex(nextIndex);
       setAnswer("");
       setEvaluation(null);
       setPhase("answering");
+      await loadQuestion(nextIndex);
     }
   };
 
-  const handleStartAgain = () => {
-    setCurrentQuestionIndex(0);
+  const handleStartAgain = async () => {
     setAnswer("");
     setEvaluation(null);
     setErrorMessage("");
     setPhase("answering");
+    await loadQuestion(0);
   };
 
   const handleBackToAnswer = () => {
     setErrorMessage("");
     setPhase("answering");
   };
+
+  // ── Loading question state ───────────────────────────────────────────────
+
+  if (isLoadingQuestion) {
+    return (
+      <Card>
+        <div className="flex flex-col gap-3 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+          <div className="flex items-center gap-3">
+            <span className="text-lg">🧠</span>
+            <span className="text-sm font-medium text-gray-500">
+              Interview Coach
+            </span>
+          </div>
+          <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-600 ring-1 ring-inset ring-blue-200">
+            {TOPIC}
+          </span>
+        </div>
+
+        <div className="flex flex-col items-center px-6 py-20 sm:px-8 lg:px-10">
+          <div className="flex items-center justify-center">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600" />
+          </div>
+          <p className="mt-6 text-base font-medium text-gray-600">
+            Loading question…
+          </p>
+        </div>
+      </Card>
+    );
+  }
+
+  // ── Question error state ─────────────────────────────────────────────────
+
+  if (questionError) {
+    return (
+      <Card>
+        <div className="flex flex-col gap-3 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+          <div className="flex items-center gap-3">
+            <span className="text-lg">🧠</span>
+            <span className="text-sm font-medium text-gray-500">
+              Interview Coach
+            </span>
+          </div>
+          <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-600 ring-1 ring-inset ring-blue-200">
+            {TOPIC}
+          </span>
+        </div>
+
+        <div className="flex flex-col items-center px-6 py-20 sm:px-8 lg:px-10">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+            <span className="text-2xl">⚠️</span>
+          </div>
+          <h2 className="mt-5 text-lg font-semibold text-gray-900">
+            Failed to Load Question
+          </h2>
+          <p className="mt-2 max-w-md text-center text-sm leading-relaxed text-gray-500">
+            {questionError}
+          </p>
+          <div className="mt-8">
+            <button
+              type="button"
+              onClick={() => loadQuestion(currentQuestionIndex)}
+              className="rounded-lg bg-blue-600 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </Card>
+    );
+  }
 
   // ── Answering phase ─────────────────────────────────────────────────────
 
@@ -221,19 +314,7 @@ const PracticeSession = () => {
 
         <div className="flex flex-col items-center px-6 py-20 sm:px-8 lg:px-10">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
-            <svg
-              className="h-7 w-7 text-red-500"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </svg>
+            <span className="text-2xl">⚠️</span>
           </div>
           <h2 className="mt-5 text-lg font-semibold text-gray-900">
             Evaluation Failed
@@ -305,7 +386,7 @@ const PracticeSession = () => {
   // ── Evaluation phase ─────────────────────────────────────────────────────
 
   const e = evaluation!;
-  const isLastQuestion = currentQuestionIndex === QUESTIONS.length - 1;
+  const isLastQuestion = currentQuestionIndex === totalQuestions - 1;
 
   return (
     <Card>

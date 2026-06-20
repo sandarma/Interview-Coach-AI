@@ -1,5 +1,6 @@
 {
   "permissions": {
+    "deny": ["Read(./node_modules/**)", "Read(./backend/node_modules/**)"],
     "allow": [
       "mcp__filesystem__read_text_file",
       "mcp__filesystem__search_files",
@@ -24,7 +25,5 @@
     ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "filesystem"
-  ]
+  "enabledMcpjsonServers": ["filesystem"]
 }
