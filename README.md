@@ -16,7 +16,7 @@
 
 <p align="center">
   <img src="./screenshots/evaluation_screen.png" width="45%">
-  <img src="./screenshots/followup_question.png" width="45%">
+  <img src="./screenshots/followup_question.jpeg" width="45%">
 </p>
 
 ---
