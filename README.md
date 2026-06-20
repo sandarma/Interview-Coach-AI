@@ -8,15 +8,16 @@
 
 ### Interview Question
 
-![Question Screen](./screenshots/question_screen.png)
+<p align="center">
+  <img src="./screenshots/question_screen.png" width="45%">
+</p>
 
-### AI Evaluation
+### AI Evaluation & Follow-up Question
 
-![Evaluation Screen](./screenshots/evaluation-screen.png)
-
-### Follow-up Question
-
-![Follow-up Question](./screenshots/follow-up-question.jpeg)
+<p align="center">
+  <img src="./screenshots/evaluation_screen.png" width="45%">
+  <img src="./screenshots/followup_question.png" width="45%">
+</p>
 
 ---
 
