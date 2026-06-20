@@ -8,7 +8,7 @@
 
 ### Interview Question
 
-![Question Screen](./screenshots/question-screen.png)
+![Question Screen](./screenshots/question_screen.png)
 
 ### AI Evaluation
 
@@ -16,7 +16,7 @@
 
 ### Follow-up Question
 
-![Follow-up Question](./screenshots/follow-up-question.png)
+![Follow-up Question](./screenshots/follow-up-question.jpeg)
 
 ---
 
