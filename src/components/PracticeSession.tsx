@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { evaluateAnswer, type EvaluationResult } from "../services/api";
+import { evaluateAnswer, type EvaluationResult } from "../services/evaluateApi";
 import { fetchQuestion } from "../services/questionApi";
 
 type Phase = "answering" | "loading" | "evaluating" | "error" | "complete";
