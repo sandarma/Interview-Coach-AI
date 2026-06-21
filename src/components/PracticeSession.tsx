@@ -2,9 +2,12 @@ import { useState, useEffect } from "react";
 import { evaluateAnswer, type EvaluationResult } from "../services/api";
 import { fetchQuestion } from "../services/questionApi";
 
-const TOPIC = "React";
-
 type Phase = "answering" | "loading" | "evaluating" | "error" | "complete";
+
+interface PracticeSessionProps {
+  topic: string;
+  onBackToWelcome: () => void;
+}
 
 // ── Shared score helpers ───────────────────────────────────────────────────
 
@@ -25,9 +28,11 @@ const scoreBg = (score: number) =>
 // ── Reusable header bar ────────────────────────────────────────────────────
 
 const HeaderBar = ({
+  topic,
   questionNumber,
   totalQuestions,
 }: {
+  topic: string;
   questionNumber: number;
   totalQuestions: number;
 }) => (
@@ -38,7 +43,7 @@ const HeaderBar = ({
     </div>
     <div className="flex items-center gap-3">
       <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-600 ring-1 ring-inset ring-blue-200">
-        {TOPIC}
+        {topic}
       </span>
       <span className="text-xs text-gray-400">
         Question {questionNumber} of {totalQuestions}
@@ -61,7 +66,7 @@ const Card = ({ children }: { children: React.ReactNode }) => (
 
 // ── Component ──────────────────────────────────────────────────────────────
 
-const PracticeSession = () => {
+const PracticeSession = ({ topic, onBackToWelcome }: PracticeSessionProps) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState("");
   const [totalQuestions, setTotalQuestions] = useState(0);
@@ -81,7 +86,7 @@ const PracticeSession = () => {
     setQuestionError("");
 
     try {
-      const result = await fetchQuestion(TOPIC, index);
+      const result = await fetchQuestion(topic, index);
       setCurrentQuestion(result.question);
       setTotalQuestions(result.totalQuestions);
       setCurrentQuestionIndex(result.questionNumber - 1);
@@ -111,7 +116,7 @@ const PracticeSession = () => {
     setErrorMessage("");
 
     try {
-      const result = await evaluateAnswer(TOPIC, currentQuestion, answer);
+      const result = await evaluateAnswer(topic, currentQuestion, answer);
       setEvaluation(result);
       setPhase("evaluating");
     } catch (err) {
@@ -168,7 +173,7 @@ const PracticeSession = () => {
             </span>
           </div>
           <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-600 ring-1 ring-inset ring-blue-200">
-            {TOPIC}
+            {topic}
           </span>
         </div>
 
@@ -197,7 +202,7 @@ const PracticeSession = () => {
             </span>
           </div>
           <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-600 ring-1 ring-inset ring-blue-200">
-            {TOPIC}
+            {topic}
           </span>
         </div>
 
@@ -231,6 +236,7 @@ const PracticeSession = () => {
     return (
       <Card>
         <HeaderBar
+          topic={topic}
           questionNumber={questionNumber}
           totalQuestions={totalQuestions}
         />
@@ -283,6 +289,7 @@ const PracticeSession = () => {
     return (
       <Card>
         <HeaderBar
+          topic={topic}
           questionNumber={questionNumber}
           totalQuestions={totalQuestions}
         />
@@ -308,6 +315,7 @@ const PracticeSession = () => {
     return (
       <Card>
         <HeaderBar
+          topic={topic}
           questionNumber={questionNumber}
           totalQuestions={totalQuestions}
         />
@@ -356,7 +364,7 @@ const PracticeSession = () => {
             </span>
           </div>
           <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-600 ring-1 ring-inset ring-blue-200">
-            {TOPIC}
+            {topic}
           </span>
         </div>
 
@@ -369,13 +377,20 @@ const PracticeSession = () => {
             You've answered all {totalQuestions} questions. Great work
             practicing your technical communication skills.
           </p>
-          <div className="mt-10">
+          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <button
               type="button"
               onClick={handleStartAgain}
               className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200"
             >
               Start Again
+            </button>
+            <button
+              type="button"
+              onClick={onBackToWelcome}
+              className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-8 py-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-200"
+            >
+              Choose Different Topic
             </button>
           </div>
         </div>
@@ -391,6 +406,7 @@ const PracticeSession = () => {
   return (
     <Card>
       <HeaderBar
+        topic={topic}
         questionNumber={questionNumber}
         totalQuestions={totalQuestions}
       />
