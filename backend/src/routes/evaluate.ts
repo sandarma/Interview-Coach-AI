@@ -16,7 +16,8 @@ evaluateRouter.post("/evaluate", async (req: Request, res: Response) => {
 
     if (!topic || !question || !answer) {
       res.status(400).json({
-        error: "Missing required fields: topic, question, and answer are required.",
+        error:
+          "Missing required fields: topic, question, and answer are required.",
       });
       return;
     }
@@ -28,7 +29,9 @@ evaluateRouter.post("/evaluate", async (req: Request, res: Response) => {
     console.error("Evaluation error:", error);
 
     const message =
-      error instanceof Error ? error.message : "Failed to evaluate the answer. Please try again.";
+      error instanceof Error
+        ? error.message
+        : "Failed to evaluate the answer. Please try again.";
 
     res.status(500).json({ error: message });
   }

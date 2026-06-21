@@ -1,6 +1,5 @@
 {
   "permissions": {
-    "deny": ["Read(./node_modules/**)", "Read(./backend/node_modules/**)"],
     "allow": [
       "mcp__filesystem__read_text_file",
       "mcp__filesystem__search_files",
@@ -21,9 +20,16 @@
       "Bash(pkill -f \"vite\")",
       "Bash(pkill -f \"tsx watch\")",
       "Bash(python3 -c ' *)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(npx tsc *)"
+    ],
+    "deny": [
+      "Read(./node_modules/**)",
+      "Read(./backend/node_modules/**)"
     ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["filesystem"]
+  "enabledMcpjsonServers": [
+    "filesystem"
+  ]
 }
