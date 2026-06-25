@@ -4,9 +4,18 @@
 
 ---
 
+If this project helped you prepare for interviews,
+please consider giving it a ⭐ on GitHub — it means a lot!
+
+👉 [Star this repo](https://github.com/sandarma/Interview-Coach-AI)
+
+---
+
 ## Live Demo
 
 🔗 **[https://interview-coach-ai-rouge.vercel.app/](https://interview-coach-ai-rouge.vercel.app/)**
+
+This app runs on a small budget — please use it mindfully 🙏 .
 
 ---
 
