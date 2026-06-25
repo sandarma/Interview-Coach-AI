@@ -4,6 +4,12 @@
 
 ---
 
+## Live Demo
+
+🔗 **[https://interview-coach-ai-rouge.vercel.app/](https://interview-coach-ai-rouge.vercel.app/)**
+
+---
+
 ## Screenshots
 
 ### Topic Selection Screen
@@ -27,70 +33,50 @@
 
 Many developers understand technical concepts but struggle to explain them clearly during interviews.
 
-Interview Coach AI focuses on improving communication and understanding rather than memorization. Users answer technical interview questions in their own words, and the AI evaluates their explanations, identifies knowledge gaps, provides constructive feedback, and suggests follow-up questions similar to a real technical interview.
+Interview Coach AI helps users practice explaining technical concepts in their own words. The AI evaluates their explanations, identifies knowledge gaps, provides constructive feedback, and suggests follow-up questions — similar to a real technical interviewer.
 
 This project is built as a Weekend MVP to demonstrate:
 
 - Claude API Integration
-- Agent-based Architecture
-- Skills-based Learning
-- MCP (Model Context Protocol)
 - Retrieval-Augmented Generation (RAG)
+- Google Sheets as a Knowledge Base
 
 ---
 
-## Problem Statement
+## Features
 
-Technical interviews often require candidates to explain concepts clearly under pressure.
+### Topic Selection
 
-Examples:
+- Dynamic topic loading from Google Sheets tabs
+- Topics are the single source of truth — add a tab, get a new topic
 
-- What is `useEffect`?
-- What is a Higher Order Function (HOF)?
-- What is the difference between `PUT` and `PATCH`?
-- How do `async` and `await` work?
+### AI Question Generation
 
-Candidates may understand these topics but struggle to articulate their knowledge during interviews.
+- Claude generates 10 interview questions per topic based on study notes
+- Questions vary in difficulty (easy, medium, hard)
+- Questions test understanding, not memorization
 
-This project helps users practice explaining concepts and receive immediate feedback.
+### Answer Evaluation
 
----
+Claude evaluates answers on three dimensions:
 
-## Features (MVP)
+- **Technical Accuracy** — Is the explanation correct?
+- **Completeness** — Are key concepts covered?
+- **Communication** — Would this work in a real interview?
 
-### Interview Question Practice
+### Coaching Feedback
 
-Users can:
-
-- Select a topic
-- Answer interview questions
-- Practice explaining concepts in their own words
-
-### AI Evaluation
-
-Claude evaluates:
-
-- Technical accuracy
-- Completeness
-- Communication clarity
-- Interview readiness
-
-### Feedback & Coaching
-
-Claude provides:
+After each answer, Claude provides:
 
 - Strengths
-- Missing points
-- Improved answer examples
-- Follow-up interview questions
+- Missing concepts
+- Improved answer example
+- Follow-up question
 
-### Personalized Learning
+### Security
 
-Based on user performance, the system recommends:
-
-- Topics to review
-- Weak areas
-- Suggested learning paths
+- Prompt injection protection — user answers are wrapped in delimiters
+- Claude is instructed to never reveal system prompts or internal details
 
 ---
 
@@ -106,194 +92,23 @@ Based on user performance, the system recommends:
 │ Express Backend │
 └────────┬────────┘
          │
-         │
-         ▼
-┌────────────────────────────────┐
-│ Interview Coach Agent          │
-├────────────────────────────────┤
-│ Question Generation            │
-│ Answer Evaluation              │
-│ Coaching Feedback              │
-│ Study Planning                 │
-└────────┬───────────────────────┘
-         │
          ├────────────────────┐
          ▼                    ▼
 ┌─────────────────┐   ┌─────────────────┐
 │ Claude API      │   │ Google Sheets   │
-└─────────────────┘   │ MCP Server      │
-                      └────────┬────────┘
-                               ▼
-                      ┌─────────────────┐
-                      │ Knowledge Base  │
-                      │ Interview Notes │
-                      └─────────────────┘
-
+│ (Questions +    │   │ (Notes)         │
+│  Evaluation)    │   │                 │
+└─────────────────┘   └─────────────────┘
 ```
 
----
+### How It Works
 
-## Methodology
-
-### Retrieval-Augmented Generation (RAG)
-
-Instead of relying solely on Claude's general knowledge, the application retrieves relevant interview notes from Google Sheets.
-
-### Workflow
-
-1. User selects a topic.
-2. System retrieves related notes from Google Sheets.
-3. Claude receives the retrieved context.
-4. Claude generates questions and evaluates answers.
-5. Claude provides personalized feedback.
-
-### Benefits
-
-- Personalized learning experience
-- Consistent explanations
-- Uses user-curated interview notes
-- Reduces hallucinations
-
----
-
-## Interview Topics
-
-The Interview Coach currently supports the following technical interview topics:
-
-### React
-
-Topics:
-
-- useEffect
-- useMemo
-- useCallback
-- Context API
-- Component Lifecycle
-
-### JavaScript
-
-Topics:
-
-- Closures
-- Higher Order Functions
-- Promises
-- Event Loop
-- Async/Await
-
-### API
-
-Topics:
-
-- REST APIs
-- Authentication
-- PUT vs PATCH
-- HTTP Status Codes
-
-Each topic contains interview questions, expected concepts and evaluation notes stored in Google Sheets.
-
----
-
-## Claude Skill
-
-### Evaluate Answer
-
-Purpose:
-
-- Evaluate interview answers
-- Score technical accuracy
-- Identify missing concepts
-- Generate coaching feedback
-- Suggest follow-up questions
-
-Input:
-
-- Question
-- User Answer
-- Retrieved Notes
-
-Output:
-
-- Scores
-- Feedback
-- Improved Answer
-- Follow-up Question
-
----
-
-## Agents
-
-### Current Agent
-
-- Interview Coach Agent
-
-The Interview Coach Agent currently combines four responsibilities:
-
-- Question Generation
-- Answer Evaluation
-- Coaching Feedback
-- Study Planning
-
-Future versions may split these responsibilities into separate agents.
-
----
-
-## MCP Integration
-
-### Google Sheets MCP Server
-
-Purpose:
-
-Store and retrieve interview preparation notes.
-
-### Example Tabs
-
-- JavaScript
-- React
-- TypeScript
-- APIs
-- Databases
-
-### Current Capabilities
-
-- Read interview notes
-- Retrieve topic content
-- Provide contextual knowledge for interview questions
-
-### Future Capabilities
-
-- Track practice history
-- Store scores
-
-### Example Query
-
-```text
-Start a React interview session.
-```
-
-System will:
-
-1. Read the React tab.
-2. Retrieve notes and expected concepts.
-3. Generate questions.
-4. Evaluate answers.
-5. Return coaching feedback.
-
----
-
-## User Flow
-
-### Practice Session
-
-1. User clicks **Start Interview**
-2. Frontend requests a question from the backend
-3. Backend retrieves relevant notes from Google Sheets
-4. Interview Coach Agent generates a question
-5. User submits an answer
-6. Backend calls Claude using the Evaluate Answer Skill
-7. Feedback and scores are displayed
-8. User chooses:
-   - Improve My Answer
-   - Continue Interview
+1. User selects a topic
+2. Backend reads notes from Google Sheets
+3. Claude generates 10 questions from the notes
+4. User answers a question
+5. Claude evaluates the answer and provides feedback
+6. User continues or improves their answer
 
 ---
 
@@ -301,33 +116,113 @@ System will:
 
 ### Frontend
 
-- React
+- React 19
 - TypeScript
-- Tailwind CSS
+- Tailwind CSS 4
+- Vite
 
 ### Backend
 
 - Node.js
-- Express.js
-- Anthropic SDK
-- dotenv
+- Express 5
+- TypeScript
 
 ### AI
 
-- Claude API
+- Claude API (claude-sonnet-4-6)
+- Two skills: `evaluate-answer`, `generate-questions`
 
 ### Knowledge Source
 
-- Google Sheets
-
-### MCP
-
-- Google Sheets MCP Server
+- Google Sheets (via `googleapis` npm package)
+- In-memory caching (10 min for questions, 1 hour for topics)
 
 ### Deployment
 
 - Vercel (Frontend)
 - Railway or Render (Backend)
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm
+- Anthropic API key
+- Google Sheet with interview notes
+- Google Cloud service account with Sheets API access
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/your-username/interview-coach.git
+cd interview-coach
+```
+
+### Frontend Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+The frontend runs on `http://localhost:5173` by default.
+
+### Backend Setup
+
+```bash
+# Navigate to backend directory
+cd backend
+
+# Install dependencies
+npm install
+
+# Create environment file
+cp .env.example .env
+```
+
+Edit `backend/.env` with your credentials:
+
+```text
+PORT=3001
+ANTHROPIC_API_KEY=your-anthropic-api-key
+GOOGLE_SHEET_ID=your-google-sheet-id
+CLIENT_SERVICE_ACCOUNT_EMAIL=your-service-account@project.iam.gserviceaccount.com
+CLIENT_SERVICE_ACCOUNT_KEY=your-private-key
+```
+
+Start the backend server:
+
+```bash
+# Development
+npm run dev
+
+# Production
+npm run build
+npm start
+```
+
+The backend runs on `http://localhost:3001` by default.
+
+### Google Sheet Structure
+
+Create a Google Sheet with tabs for each topic:
+
+```text
+Interview Notes
+├── React
+├── JavaScript
+├── TypeScript
+├── APIs
+└── Databases
+```
+
+Each tab should have interview notes in column B (starting from row 2).
 
 ---
 
@@ -347,26 +242,24 @@ useEffect is used when component renders.
 
 ### Claude Feedback
 
+#### Score: 60%
+
 #### Strengths
 
 - Correct basic understanding
 
-#### Missing Points
+#### Missing Concepts
 
 - Side effects explanation
 - Dependency array behavior
 - Common use cases
 
-#### Interview Score
-
-```text
-60%
-```
-
 #### Improved Answer
 
 ```text
-useEffect is a React Hook used to perform side effects such as API calls, subscriptions, and DOM updates. It runs after render and can be controlled using the dependency array.
+useEffect is a React Hook used to perform side effects such as API calls,
+subscriptions, and DOM updates. It runs after render and can be controlled
+using the dependency array.
 ```
 
 #### Follow-up Question
@@ -377,27 +270,14 @@ What happens when the dependency array is empty?
 
 ---
 
-## Future Enhancements
+## API Endpoints
 
-- Voice interview mode
-- Speech-to-text answers
-- Mock interview simulation
-- Coding challenge evaluation
-- Interview history dashboard
-- AI-generated learning plans
-- Role-specific interviews (Frontend, Backend, Full Stack)
-
----
-
-## Success Criteria
-
-The MVP is successful if a user can:
-
-- Practice interview questions
-- Receive AI-generated feedback
-- Review knowledge from Google Sheets
-- Identify weak areas
-- Improve explanation skills
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/question` | Get a question (`{topic, questionIndex}`) |
+| `POST` | `/api/evaluate` | Evaluate an answer (`{topic, question, answer}`) |
+| `GET` | `/api/topics` | List available topics |
+| `GET` | `/api/health` | Health check |
 
 ---
 
