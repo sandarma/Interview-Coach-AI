@@ -1,4 +1,5 @@
 import { google } from "googleapis";
+import { generateQuestions } from "./claudeService.js";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -86,9 +87,9 @@ export async function getValidTopics(): Promise<string[]> {
   return topics;
 }
 
-// ── Question reader ────────────────────────────────────────────────────────
+// ── Notes reader ───────────────────────────────────────────────────────────
 
-async function fetchQuestionsForTopic(topic: string): Promise<string[]> {
+async function fetchNotesForTopic(topic: string): Promise<string> {
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID!,
     range: `'${topic}'!B2:B`,
@@ -96,10 +97,14 @@ async function fetchQuestionsForTopic(topic: string): Promise<string[]> {
 
   const rows = res.data.values ?? [];
 
-  return rows
+  const notes = rows
     .map((row) => (row[0] as string | undefined)?.trim())
-    .filter((q): q is string => q !== undefined && q.length > 0);
+    .filter((note): note is string => note !== undefined && note.length > 0);
+
+  return notes.join("\n");
 }
+
+// ── Question loader ────────────────────────────────────────────────────────
 
 async function loadQuestions(topic: string): Promise<string[]> {
   const cached = questionCache.get(topic);
@@ -107,7 +112,16 @@ async function loadQuestions(topic: string): Promise<string[]> {
     return cached.questions;
   }
 
-  const questions = await fetchQuestionsForTopic(topic);
+  // Read notes from Google Sheets
+  const notes = await fetchNotesForTopic(topic);
+
+  if (!notes || notes.trim().length === 0) {
+    throw new Error(`No notes found for topic "${topic}".`);
+  }
+
+  // Generate 10 questions dynamically from the notes
+  const questions = await generateQuestions(notes);
+
   questionCache.set(topic, { questions, loadedAt: Date.now() });
   return questions;
 }

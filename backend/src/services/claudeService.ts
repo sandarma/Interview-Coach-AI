@@ -37,7 +37,7 @@ interface RawClaudeResponse {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const SKILL_PATH = join(
+const EVALUATE_SKILL_PATH = join(
   __dirname,
   "..",
   "..",
@@ -48,20 +48,30 @@ const SKILL_PATH = join(
   "SKILL.md",
 );
 
-const SYSTEM_PROMPT = loadSkillFile();
+const GENERATE_SKILL_PATH = join(
+  __dirname,
+  "..",
+  "..",
+  "..",
+  ".claude",
+  "skills",
+  "generate-questions",
+  "SKILL.md",
+);
+
+const EVALUATE_SYSTEM_PROMPT = loadSkillFile(EVALUATE_SKILL_PATH);
+const GENERATE_SYSTEM_PROMPT = loadSkillFile(GENERATE_SKILL_PATH);
 const API_URL = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-sonnet-4-6";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-function loadSkillFile(): string {
+function loadSkillFile(path: string): string {
   try {
-    return readFileSync(SKILL_PATH, "utf-8");
+    return readFileSync(path, "utf-8");
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    throw new Error(
-      `Failed to load evaluation skill file from ${SKILL_PATH}: ${message}`,
-    );
+    throw new Error(`Failed to load skill file from ${path}: ${message}`);
   }
 }
 
@@ -154,6 +164,86 @@ function validateResponse(raw: unknown): RawClaudeResponse {
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
+// ── Question generation ─────────────────────────────────────────────────────
+
+export async function generateQuestions(notes: string): Promise<string[]> {
+  const apiKey = getApiKey();
+
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: 1024,
+      temperature: 0.7,
+      system: GENERATE_SYSTEM_PROMPT,
+      messages: [
+        {
+          role: "user",
+          content: `## Study Notes\n\n${notes}`,
+        },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    throw new Error(
+      `Claude API error (${response.status}): ${body || response.statusText}`,
+    );
+  }
+
+  const message = (await response.json()) as {
+    content: { type: string; text: string }[];
+  };
+
+  const textBlocks = message.content.filter(
+    (block) => block.type === "text",
+  );
+
+  if (textBlocks.length === 0) {
+    throw new Error("Claude returned no text content in the response.");
+  }
+
+  const rawResponse = textBlocks.map((b) => b.text).join("");
+
+  let parsed: unknown;
+  try {
+    const cleaned = rawResponse
+      .replace(/^```(?:json)?\s*/i, "")
+      .replace(/\s*```$/i, "")
+      .trim();
+
+    parsed = JSON.parse(cleaned);
+  } catch {
+    throw new Error(
+      "Claude returned a response that could not be parsed as JSON.",
+    );
+  }
+
+  if (!Array.isArray(parsed) || parsed.length === 0) {
+    throw new Error("Claude did not return a valid array of questions.");
+  }
+
+  const questions = (parsed as unknown[])
+    .filter((q): q is string => typeof q === "string" && q.trim().length > 0)
+    .map((q) => q.trim());
+
+  if (questions.length < 5) {
+    throw new Error(
+      `Claude generated too few questions (${questions.length}). Expected at least 5.`,
+    );
+  }
+
+  return questions;
+}
+
+// ── Answer evaluation ──────────────────────────────────────────────────────
+
 export async function evaluateAnswer(
   question: string,
   answer: string,
@@ -172,7 +262,7 @@ export async function evaluateAnswer(
       model: MODEL,
       max_tokens: 2048,
       temperature: 0.4,
-      system: SYSTEM_PROMPT,
+      system: EVALUATE_SYSTEM_PROMPT,
       messages: [
         {
           role: "user",
