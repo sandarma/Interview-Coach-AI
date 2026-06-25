@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { evaluateAnswer } from "../services/claudeService.js";
+import { getValidTopics } from "../services/questionService.js";
 
 export const evaluateRouter = Router();
 
@@ -18,6 +19,15 @@ evaluateRouter.post("/evaluate", async (req: Request, res: Response) => {
       res.status(400).json({
         error:
           "Missing required fields: topic, question, and answer are required.",
+      });
+      return;
+    }
+
+    const validTopics = await getValidTopics();
+
+    if (!validTopics.includes(topic)) {
+      res.status(400).json({
+        error: `Topic "${topic}" not found. Available topics: ${validTopics.join(", ")}`,
       });
       return;
     }

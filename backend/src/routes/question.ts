@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { getQuestion, getTopics } from "../services/questionService.js";
+import { getQuestion, getValidTopics } from "../services/questionService.js";
 
 export const questionRouter = Router();
 
@@ -37,7 +37,17 @@ questionRouter.post("/question", async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/topics — list all available topics
-questionRouter.get("/topics", (_req: Request, res: Response) => {
-  res.json({ topics: getTopics() });
+// GET /api/topics — list all available topics from Google Sheets tabs
+questionRouter.get("/topics", async (_req: Request, res: Response) => {
+  try {
+    const topics = await getValidTopics();
+    res.json(topics);
+  } catch (error) {
+    console.error("Topics error:", error);
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Failed to retrieve topics.";
+    res.status(500).json({ error: message });
+  }
 });

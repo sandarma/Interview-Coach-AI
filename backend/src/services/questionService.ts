@@ -21,7 +21,7 @@ const PRIVATE_KEY = (process.env.CLIENT_SERVICE_ACCOUNT_KEY || "").replace(
   "\n",
 );
 
-const TOPICS = ["React", "JavaScript", "TypeScript", "APIs", "Databases"];
+const EXCLUDED_TABS = ["General", "Just FYI", "Refs"];
 
 const auth = new google.auth.GoogleAuth({
   credentials: {
@@ -33,25 +33,57 @@ const auth = new google.auth.GoogleAuth({
 
 const sheets = google.sheets({ version: "v4", auth });
 
-// ── In-memory cache ───────────────────────────────────────────────────────
+// ── In-memory caches ───────────────────────────────────────────────────────
 
-const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+const QUESTION_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+const TOPIC_CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 
-interface CacheEntry {
+interface QuestionCacheEntry {
   questions: string[];
   loadedAt: number;
 }
 
-const cache: Map<string, CacheEntry> = new Map();
-
-function isFresh(entry: CacheEntry): boolean {
-  return Date.now() - entry.loadedAt < CACHE_TTL_MS;
+interface TopicCacheEntry {
+  topics: string[];
+  loadedAt: number;
 }
 
-// ── Sheet reader ───────────────────────────────────────────────────────────
+const questionCache: Map<string, QuestionCacheEntry> = new Map();
+let topicCache: TopicCacheEntry | null = null;
+
+function isFresh(entry: { loadedAt: number }, ttlMs: number): boolean {
+  return Date.now() - entry.loadedAt < ttlMs;
+}
+
+// ── Topic reader ───────────────────────────────────────────────────────────
+
+async function fetchSheetTabNames(): Promise<string[]> {
+  const res = await sheets.spreadsheets.get({
+    spreadsheetId: SHEET_ID!,
+    fields: "sheets.properties.title",
+  });
+
+  const tabs =
+    res.data.sheets?.map(
+      (sheet) => sheet.properties?.title as string,
+    ) ?? [];
+
+  return tabs.filter((name) => !EXCLUDED_TABS.includes(name));
+}
+
+export async function getValidTopics(): Promise<string[]> {
+  if (topicCache && isFresh(topicCache, TOPIC_CACHE_TTL_MS)) {
+    return topicCache.topics;
+  }
+
+  const topics = await fetchSheetTabNames();
+  topicCache = { topics, loadedAt: Date.now() };
+  return topics;
+}
+
+// ── Question reader ────────────────────────────────────────────────────────
 
 async function fetchQuestionsForTopic(topic: string): Promise<string[]> {
-  // Read column B (Question) from row 2 onward, skipping the header
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID!,
     range: `'${topic}'!B2:B`,
@@ -59,20 +91,19 @@ async function fetchQuestionsForTopic(topic: string): Promise<string[]> {
 
   const rows = res.data.values ?? [];
 
-  // Flatten, trim, and filter out empty rows
   return rows
     .map((row) => (row[0] as string | undefined)?.trim())
     .filter((q): q is string => q !== undefined && q.length > 0);
 }
 
 async function loadQuestions(topic: string): Promise<string[]> {
-  const cached = cache.get(topic);
-  if (cached && isFresh(cached)) {
+  const cached = questionCache.get(topic);
+  if (cached && isFresh(cached, QUESTION_CACHE_TTL_MS)) {
     return cached.questions;
   }
 
   const questions = await fetchQuestionsForTopic(topic);
-  cache.set(topic, { questions, loadedAt: Date.now() });
+  questionCache.set(topic, { questions, loadedAt: Date.now() });
   return questions;
 }
 
@@ -82,15 +113,15 @@ export async function getQuestion(
   topic: string,
   questionIndex: number,
 ): Promise<QuestionResponse | QuestionError> {
-  if (!TOPICS.includes(topic)) {
-    return {
-      error: `Topic "${topic}" not found. Available topics: ${TOPICS.join(", ")}`,
-    };
+  if (!SHEET_ID || !CLIENT_EMAIL || !PRIVATE_KEY) {
+    return { error: "Google Sheets credentials are not configured." };
   }
 
-  if (!SHEET_ID || !CLIENT_EMAIL || !PRIVATE_KEY) {
+  const validTopics = await getValidTopics();
+
+  if (!validTopics.includes(topic)) {
     return {
-      error: "Google Sheets credentials are not configured.",
+      error: `Topic "${topic}" not found. Available topics: ${validTopics.join(", ")}`,
     };
   }
 
@@ -117,8 +148,4 @@ export async function getQuestion(
     questionNumber: questionIndex + 1,
     totalQuestions: questions.length,
   };
-}
-
-export function getTopics(): string[] {
-  return TOPICS;
 }
