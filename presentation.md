@@ -11,7 +11,7 @@ auto-advance: 20
 
 Developers and job seekers preparing for technical interviews
 
-They understands many technical concepts but struggles to explain them clearly during interviews.
+They understand many technical concepts but struggle to explain them clearly during interviews.
 
 Examples:
 
@@ -50,10 +50,10 @@ An AI-powered interview practice tool.
 
 Features:
 
-- Technical interview questions
+- Dynamic topic selection from Google Sheets
+- AI-generated interview questions (10 per topic)
 - AI answer evaluation
-- Coaching feedback
-- Improved answer suggestions
+- Coaching feedback with improved answers
 - Follow-up interview questions
 
 Focus:
@@ -66,31 +66,26 @@ Understanding over memorisation.
 
 # How I built it
 
-### Agent
+### Skills
 
-Interview Coach Agent
+Evaluate Answer + Generate Questions
 
-- Generates questions
-- Evaluates answers
-- Provides coaching
-- Recommends next topics
-
-### Skill
-
-Evaluate Answer Skill
-
-- Scores responses
+- Scores responses across 3 dimensions
 - Identifies missing concepts
-- Creates feedback
-- Generates follow-up questions
+- Creates coaching feedback
+- Generates 10 questions from study notes
 
-### MCP
+### RAG Pipeline
 
-Google Sheets MCP Server
+Google Sheets → Claude API
 
-- Retrieves interview notes
-- Provides question context
-- Supports RAG workflow
+- Reads study notes from Google Sheets tabs
+- Notes provide context for question generation
+- Notes ground evaluations in curated content
+
+### Tech Stack
+
+React + Express + Claude API + Google Sheets
 
 ---
 
@@ -114,11 +109,12 @@ The goal is to help developers explain concepts clearly in real interviews.
 # Done checklist
 
 - [x] Repo public
-- [x] Agent implemented
-- [x] Skill implemented
-- [x] MCP design completed
-- [x] React frontend
-- [x] Express backend
-- [ ] Claude API connected
-- [ ] Google Sheets connected
+- [x] Two skills implemented (evaluate + generate)
+- [x] React frontend with topic selection
+- [x] Express backend with 3 endpoints
+- [x] Claude API connected (raw fetch)
+- [x] Google Sheets connected (googleapis)
+- [x] Dynamic question generation
+- [x] Prompt injection protection
+- [x] Rate limiting (production)
 - [x] report.md committed
