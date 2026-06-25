@@ -34,7 +34,7 @@ const WelcomeScreen = ({ onSelectTopic }: WelcomeScreenProps) => {
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:py-24">
         {/* Header */}
         <div className="text-center">
-          <span className="text-5xl">🧠</span>
+          <span className="text-5xl">🤖</span>
           <h1 className="mt-6 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Interview Coach AI
           </h1>

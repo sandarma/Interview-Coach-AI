@@ -31,15 +31,23 @@ const HeaderBar = ({
   topic,
   questionNumber,
   totalQuestions,
+  onBackToWelcome,
 }: {
   topic: string;
   questionNumber: number;
   totalQuestions: number;
+  onBackToWelcome: () => void;
 }) => (
   <div className="flex flex-col gap-3 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
     <div className="flex items-center gap-3">
-      <span className="text-lg">🧠</span>
-      <span className="text-sm font-medium text-gray-500">Interview Coach</span>
+      <button
+        type="button"
+        onClick={onBackToWelcome}
+        className="flex items-center gap-2 text-sm text-gray-400 transition hover:text-gray-600"
+      >
+        <span>←</span>
+        <span>Choose Another Topic</span>
+      </button>
     </div>
     <div className="flex items-center gap-3">
       <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-600 ring-1 ring-inset ring-blue-200">
@@ -57,6 +65,14 @@ const HeaderBar = ({
 const Card = ({ children }: { children: React.ReactNode }) => (
   <div className="min-h-screen bg-gray-50">
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:py-12">
+      {/* App header — matches WelcomeScreen */}
+      <div className="mb-8 text-center">
+        <span className="text-4xl">🤖</span>
+        <h1 className="mt-3 text-2xl font-bold tracking-tight text-gray-900">
+          Interview Coach AI
+        </h1>
+      </div>
+
       <div className="overflow-hidden rounded-2xl bg-white shadow-md">
         {children}
       </div>
@@ -164,28 +180,46 @@ const PracticeSession = ({ topic, onBackToWelcome }: PracticeSessionProps) => {
 
   if (isLoadingQuestion) {
     return (
-      <Card>
-        <div className="flex flex-col gap-3 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-          <div className="flex items-center gap-3">
-            <span className="text-lg">🧠</span>
-            <span className="text-sm font-medium text-gray-500">
-              Interview Coach
-            </span>
-          </div>
-          <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-600 ring-1 ring-inset ring-blue-200">
-            {topic}
-          </span>
-        </div>
-
-        <div className="flex flex-col items-center px-6 py-20 sm:px-8 lg:px-10">
-          <div className="flex items-center justify-center">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600" />
-          </div>
-          <p className="mt-6 text-base font-medium text-gray-600">
-            Loading question…
+      <>
+        {/* Header */}
+        <div className="text-center">
+          <span className="text-5xl">🤖</span>
+          <h1 className="mt-6 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            Interview Coach AI
+          </h1>
+          <p className="mt-4 text-base leading-relaxed text-gray-500">
+            Practice technical interview questions and receive AI-powered
+            feedback.
           </p>
         </div>
-      </Card>
+
+        <Card>
+          <div className="flex flex-col gap-3 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={onBackToWelcome}
+                className="flex items-center gap-2 text-sm text-gray-400 transition hover:text-gray-600"
+              >
+                <span>←</span>
+                <span>Choose Another Topic</span>
+              </button>
+            </div>
+            <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-600 ring-1 ring-inset ring-blue-200">
+              {topic}
+            </span>
+          </div>
+
+          <div className="flex flex-col items-center px-6 py-20 sm:px-8 lg:px-10">
+            <div className="flex items-center justify-center">
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600" />
+            </div>
+            <p className="mt-6 text-base font-medium text-gray-600">
+              Loading question…
+            </p>
+          </div>
+        </Card>
+      </>
     );
   }
 
@@ -196,10 +230,14 @@ const PracticeSession = ({ topic, onBackToWelcome }: PracticeSessionProps) => {
       <Card>
         <div className="flex flex-col gap-3 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <div className="flex items-center gap-3">
-            <span className="text-lg">🧠</span>
-            <span className="text-sm font-medium text-gray-500">
-              Interview Coach
-            </span>
+            <button
+              type="button"
+              onClick={onBackToWelcome}
+              className="flex items-center gap-2 text-sm text-gray-400 transition hover:text-gray-600"
+            >
+              <span>←</span>
+              <span>Choose Another Topic</span>
+            </button>
           </div>
           <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-600 ring-1 ring-inset ring-blue-200">
             {topic}
@@ -239,6 +277,7 @@ const PracticeSession = ({ topic, onBackToWelcome }: PracticeSessionProps) => {
           topic={topic}
           questionNumber={questionNumber}
           totalQuestions={totalQuestions}
+          onBackToWelcome={onBackToWelcome}
         />
 
         <div className="px-6 py-8 sm:px-8 lg:px-10">
@@ -292,6 +331,7 @@ const PracticeSession = ({ topic, onBackToWelcome }: PracticeSessionProps) => {
           topic={topic}
           questionNumber={questionNumber}
           totalQuestions={totalQuestions}
+          onBackToWelcome={onBackToWelcome}
         />
 
         <div className="flex flex-col items-center px-6 py-20 sm:px-8 lg:px-10">
@@ -318,6 +358,7 @@ const PracticeSession = ({ topic, onBackToWelcome }: PracticeSessionProps) => {
           topic={topic}
           questionNumber={questionNumber}
           totalQuestions={totalQuestions}
+          onBackToWelcome={onBackToWelcome}
         />
 
         <div className="flex flex-col items-center px-6 py-20 sm:px-8 lg:px-10">
@@ -358,7 +399,7 @@ const PracticeSession = ({ topic, onBackToWelcome }: PracticeSessionProps) => {
       <Card>
         <div className="flex flex-col gap-3 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <div className="flex items-center gap-3">
-            <span className="text-lg">🧠</span>
+            <span className="text-lg">🤖</span>
             <span className="text-sm font-medium text-gray-500">
               Interview Coach
             </span>
@@ -409,6 +450,7 @@ const PracticeSession = ({ topic, onBackToWelcome }: PracticeSessionProps) => {
         topic={topic}
         questionNumber={questionNumber}
         totalQuestions={totalQuestions}
+        onBackToWelcome={onBackToWelcome}
       />
 
       <div className="px-6 py-8 sm:px-8 lg:px-10">

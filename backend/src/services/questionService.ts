@@ -18,10 +18,17 @@ const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 const CLIENT_EMAIL = process.env.CLIENT_SERVICE_ACCOUNT_EMAIL;
 const PRIVATE_KEY = (process.env.CLIENT_SERVICE_ACCOUNT_KEY || "").replace(
   /\\n/g,
-  "\n",
+  "\n"
 );
 
-const EXCLUDED_TABS = ["General", "Just FYI", "Refs"];
+const EXCLUDED_TABS = [
+  "TypeScript",
+  "Databases",
+  "Laravel(PHP)",
+  "General",
+  "Just FYI",
+  "Refs",
+];
 
 const auth = new google.auth.GoogleAuth({
   credentials: {
@@ -64,9 +71,7 @@ async function fetchSheetTabNames(): Promise<string[]> {
   });
 
   const tabs =
-    res.data.sheets?.map(
-      (sheet) => sheet.properties?.title as string,
-    ) ?? [];
+    res.data.sheets?.map((sheet) => sheet.properties?.title as string) ?? [];
 
   return tabs.filter((name) => !EXCLUDED_TABS.includes(name));
 }
@@ -111,7 +116,7 @@ async function loadQuestions(topic: string): Promise<string[]> {
 
 export async function getQuestion(
   topic: string,
-  questionIndex: number,
+  questionIndex: number
 ): Promise<QuestionResponse | QuestionError> {
   if (!SHEET_ID || !CLIENT_EMAIL || !PRIVATE_KEY) {
     return { error: "Google Sheets credentials are not configured." };
@@ -121,7 +126,9 @@ export async function getQuestion(
 
   if (!validTopics.includes(topic)) {
     return {
-      error: `Topic "${topic}" not found. Available topics: ${validTopics.join(", ")}`,
+      error: `Topic "${topic}" not found. Available topics: ${validTopics.join(
+        ", "
+      )}`,
     };
   }
 

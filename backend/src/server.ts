@@ -14,17 +14,20 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Rate limiter for evaluations: 10 per hour per IP
-const evaluateLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10,
-  message: { error: "Rate limit exceeded. Please try again later." },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// Rate limiter for evaluations: 10 per hour per IP (production only)
+if (process.env.NODE_ENV === "production") {
+  const evaluateLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 10,
+    message: { error: "Rate limit exceeded. Please try again later." },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  app.use("/api/evaluate", evaluateLimiter);
+}
 
 // Routes
-app.use("/api", evaluateLimiter, evaluateRouter);
+app.use("/api", evaluateRouter);
 app.use("/api", questionRouter);
 
 // Health check
