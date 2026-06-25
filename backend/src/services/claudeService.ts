@@ -80,10 +80,26 @@ function buildUserMessage(
   answer: string,
   notes?: string,
 ): string {
-  const parts = ["## Question", question, "", "## User Answer", answer];
+  const parts = [
+    "## Question",
+    question,
+    "",
+    "## User Answer",
+    "",
+    "USER_ANSWER_START",
+    answer,
+    "USER_ANSWER_END",
+  ];
 
   if (notes && notes.trim().length > 0) {
-    parts.push("", "## Retrieved Notes", notes);
+    parts.push(
+      "",
+      "## Retrieved Notes",
+      "",
+      "REFERENCE_NOTES_START",
+      notes,
+      "REFERENCE_NOTES_END",
+    );
   }
 
   return parts.join("\n");
