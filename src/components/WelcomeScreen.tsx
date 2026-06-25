@@ -94,6 +94,11 @@ const WelcomeScreen = ({ onSelectTopic }: WelcomeScreenProps) => {
             </div>
           )}
         </div>
+
+        {/* Footer */}
+        <p className="mt-16 text-center text-xs text-gray-400">
+          © 2026 Sandar Min Aye. All rights reserved.
+        </p>
       </div>
     </div>
   );

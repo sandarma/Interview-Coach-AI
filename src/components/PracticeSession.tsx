@@ -76,6 +76,11 @@ const Card = ({ children }: { children: React.ReactNode }) => (
       <div className="overflow-hidden rounded-2xl bg-white shadow-md">
         {children}
       </div>
+
+      {/* Footer */}
+      <p className="mt-8 text-center text-xs text-gray-400">
+        © 2026 Sandar Min Aye. All rights reserved.
+      </p>
     </div>
   </div>
 );
