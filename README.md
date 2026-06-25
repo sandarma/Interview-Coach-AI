@@ -24,7 +24,7 @@
   <img src="./screenshots/Practice_Screen.png" width="45%">
 </p>
 <p align="center">
-  <img src="./screenshots/Feedback_Screen.jpeg" width="45%">
+  <img src="./screenshots/Feedback_Screen.png" width="45%">
 </p>
 
 ---
@@ -272,12 +272,12 @@ What happens when the dependency array is empty?
 
 ## API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/question` | Get a question (`{topic, questionIndex}`) |
+| Method | Endpoint        | Description                                      |
+| ------ | --------------- | ------------------------------------------------ |
+| `POST` | `/api/question` | Get a question (`{topic, questionIndex}`)        |
 | `POST` | `/api/evaluate` | Evaluate an answer (`{topic, question, answer}`) |
-| `GET` | `/api/topics` | List available topics |
-| `GET` | `/api/health` | Health check |
+| `GET`  | `/api/topics`   | List available topics                            |
+| `GET`  | `/api/health`   | Health check                                     |
 
 ---
 
