@@ -182,7 +182,7 @@ const PracticeSession = ({ topic, onBackToWelcome }: PracticeSessionProps) => {
     return (
       <>
         {/* Header */}
-        <div className="text-center">
+        {/* <div className="text-center">
           <span className="text-5xl">🤖</span>
           <h1 className="mt-6 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Interview Coach AI
@@ -191,7 +191,7 @@ const PracticeSession = ({ topic, onBackToWelcome }: PracticeSessionProps) => {
             Practice technical interview questions and receive AI-powered
             feedback.
           </p>
-        </div>
+        </div> */}
 
         <Card>
           <div className="flex flex-col gap-3 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
@@ -295,23 +295,33 @@ const PracticeSession = ({ topic, onBackToWelcome }: PracticeSessionProps) => {
             <textarea
               id="answer"
               rows={10}
+              maxLength={1000}
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               placeholder="Type your explanation here…"
               className="w-full min-h-40 resize-y rounded-lg border border-gray-300 px-4 py-3 text-base leading-relaxed text-gray-800 placeholder-gray-400 transition focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-100"
             />
+            <p
+              className={`mt-1 text-right text-xs ${
+                answer.length > 800 ? "text-red-500" : "text-gray-400"
+              }`}
+            >
+              {answer.length} / 1000
+            </p>
           </div>
 
           <div className="mt-6 flex flex-col gap-4 border-t border-gray-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-xs text-gray-400">
               {answer.length > 0
-                ? `${answer.length} characters`
+                ? answer.length > 800
+                  ? `${1000 - answer.length} characters remaining`
+                  : "Be thorough — aim for a few sentences"
                 : "Be thorough — aim for a few sentences"}
             </span>
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={answer.trim().length === 0}
+              disabled={answer.trim().length === 0 || answer.length > 1000}
               className="w-full rounded-lg bg-blue-600 px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             >
               Submit Answer

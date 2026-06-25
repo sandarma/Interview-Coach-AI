@@ -23,6 +23,13 @@ evaluateRouter.post("/evaluate", async (req: Request, res: Response) => {
       return;
     }
 
+    if (answer.length > 1000) {
+      res.status(400).json({
+        error: "Answer is too long. Maximum 1000 characters allowed.",
+      });
+      return;
+    }
+
     const validTopics = await getValidTopics();
 
     if (!validTopics.includes(topic)) {
