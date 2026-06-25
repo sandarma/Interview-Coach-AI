@@ -6,19 +6,19 @@
 
 ## Screenshots
 
-### Interview Question
+### Topic Selection Screen
 
 <p align="center">
-  <img src="./screenshots/question_screen.png" width="45%">
+  <img src="./screenshots/Welcome_Screen.png" width="45%">
 </p>
 
-### AI Evaluation & Follow-up Question
+### AI Generating Questions & Evaluation Screen
 
 <p align="center">
-  <img src="./screenshots/evaluation_screen.png" width="45%">
+  <img src="./screenshots/Practice_Screen.png" width="45%">
 </p>
 <p align="center">
-  <img src="./screenshots/followup_question.jpeg" width="45%">
+  <img src="./screenshots/Feedback_Screen.jpeg" width="45%">
 </p>
 
 ---
