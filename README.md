@@ -149,7 +149,7 @@ After each answer, Claude provides:
 ### Deployment
 
 - Vercel (Frontend)
-- Railway or Render (Backend)
+- Render (Backend)
 
 ---
 
@@ -166,8 +166,8 @@ After each answer, Claude provides:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/interview-coach.git
-cd interview-coach
+git clone https://github.com/sandarma/interview-coach-ai.git
+cd interview-coach-ai
 ```
 
 ### Frontend Setup
@@ -226,9 +226,9 @@ Create a Google Sheet with tabs for each topic:
 Interview Notes
 ├── React
 ├── JavaScript
-├── TypeScript
 ├── APIs
-└── Databases
+├── AI
+└── Laravel(PHP)
 ```
 
 Each tab should have interview notes in column B (starting from row 2).

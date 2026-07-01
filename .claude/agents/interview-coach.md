@@ -1,7 +1,7 @@
 ---
 name: interview-coach
 description: Use this agent when a user wants to practice technical interview questions, receive feedback, or get study recommendations.
-tools: Read, GoogleSheets
+tools: Read
 ---
 
 # Interview Coach Agent
@@ -111,7 +111,7 @@ Expected output:
 
 ## Available Tools
 
-### Google Sheets MCP
+### Google Sheets API (googleapis)
 
 Use when:
 
@@ -121,7 +121,7 @@ Use when:
 
 Responsibilities:
 
-- Retrieve topic notes.
+- Retrieve topic notes from Google Sheets via the `googleapis` npm package.
 - Retrieve examples.
 - Retrieve interview preparation content.
 
@@ -286,31 +286,14 @@ Study all React Hooks.
 
 ## Google Sheets Retrieval Rules
 
-When retrieving interview questions from Google Sheets:
+The backend reads study notes from column B (rows 2+) of each topic tab via the `googleapis` npm package.
 
-Use:
-
-- Topic
-- Question
-
-Ignore:
-
-- Prepared?
-- Important Lvl
-
-unless the user specifically requests them.
+Each topic tab contains interview notes in column B. These notes are passed to Claude as context for question generation and answer evaluation.
 
 When evaluating an answer:
 
-Use:
-
-- Topic
-- Question
-- Explanation
-
-Use the Explanation column as the reference knowledge and expected concepts.
-
-Do not expose the Explanation column directly to the user unless requested.
+- Use the retrieved notes as reference knowledge and expected concepts.
+- Do not expose the raw notes directly to the user unless requested.
 
 ---
 
@@ -328,7 +311,7 @@ Frontend:
 
 Backend:
 
-- Retrieve interview notes from Google Sheets via MCP
+- Retrieve interview notes from Google Sheets via the `googleapis` npm package
 - Execute agent workflows
 - Call Claude API
 - Return structured evaluation results

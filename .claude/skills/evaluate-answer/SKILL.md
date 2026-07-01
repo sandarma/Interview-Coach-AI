@@ -41,7 +41,7 @@ useEffect is used when component renders.
 
 ### Retrieved Notes
 
-Relevant notes retrieved from Google Sheets via MCP.
+Relevant notes retrieved from Google Sheets via the Google Sheets API.
 
 These notes provide additional context about what concepts are important.
 

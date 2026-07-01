@@ -44,9 +44,9 @@ Assume the following technology stack unless explicitly instructed otherwise:
 
 - Retrieval-Augmented Generation (RAG)
 
-### MCP
+### Knowledge Retrieval
 
-- Google Sheets MCP Server
+- Google Sheets API via `googleapis` npm package
 
 When generating code:
 
@@ -79,7 +79,7 @@ Responsibilities:
 - Evaluate user answers
 - Provide coaching feedback
 - Recommend study topics
-- Retrieve knowledge from Google Sheets via MCP
+- Retrieve knowledge from Google Sheets via the `googleapis` npm package
 
 ---
 
@@ -117,11 +117,11 @@ Output:
 
 ---
 
-## MCP servers
+## Knowledge Source
 
-### Google Sheets MCP Server
+### Google Sheets API (googleapis)
 
-Use this server as the primary knowledge source.
+Google Sheets is the primary knowledge source, accessed via the `googleapis` npm package in the backend.
 
 Expected sheet structure:
 
@@ -129,14 +129,14 @@ Expected sheet structure:
 Interview Notes
 ├── React
 ├── JavaScript
-├── TypeScript
 ├── APIs
-└── Databases
+├── AI
+└── Laravel(PHP)
 ```
 
 Responsibilities:
 
-- Read interview notes.
+- Read interview notes from Google Sheets tabs.
 - Retrieve concepts relevant to the selected topic.
 - Retrieve examples and explanations.
 
@@ -147,7 +147,7 @@ Future capabilities:
 
 Before generating questions:
 
-1. Retrieve relevant notes.
+1. Retrieve relevant notes from Google Sheets.
 2. Use retrieved notes as context.
 3. Generate questions based on retrieved content.
 
@@ -161,11 +161,11 @@ The application currently supports interview practice in:
 
 - React
 - JavaScript
-- TypeScript
 - APIs
-- Databases
+- AI
+- Laravel (PHP)
 
-Topics are stored in Google Sheets and retrieved through MCP.
+Topics are stored in Google Sheets and retrieved through the `googleapis` npm package.
 
 ---
 
@@ -204,7 +204,7 @@ Always prioritize:
 
 1. Interview Coach Agent
 2. Evaluate Answer Skill
-3. Google Sheets MCP integration
+3. Google Sheets integration
 4. Question generation
 5. Answer evaluation
 6. Coaching feedback
@@ -218,8 +218,8 @@ Do not introduce additional agents or skills unless they provide clear value to 
 Current implementation:
 
 - One Agent: Interview Coach Agent
-- One Skill: Evaluate Answer
-- One MCP: Google Sheets MCP
+- Two Skills: Evaluate Answer, Generate Questions
+- One Knowledge Source: Google Sheets via `googleapis`
 
 Future versions may introduce:
 
