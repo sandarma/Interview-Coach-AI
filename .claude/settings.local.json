@@ -21,7 +21,8 @@
       "Bash(pkill -f \"tsx watch\")",
       "Bash(python3 -c ' *)",
       "Bash(node *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "mcp__filesystem__read_multiple_files"
     ],
     "deny": [
       "Read(./node_modules/**)",
