@@ -14,7 +14,6 @@ interface EvaluateRequest {
   topic: string;
   question: string;
   answer: string;
-  notes?: string;
 }
 
 const API_BASE_URL =
@@ -24,12 +23,8 @@ export async function evaluateAnswer(
   topic: string,
   question: string,
   answer: string,
-  notes?: string,
 ): Promise<EvaluationResult> {
   const body: EvaluateRequest = { topic, question, answer };
-  if (notes) {
-    body.notes = notes;
-  }
 
   const response = await fetch(`${API_BASE_URL}/api/evaluate`, {
     method: "POST",

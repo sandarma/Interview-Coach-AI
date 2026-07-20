@@ -207,10 +207,12 @@ export async function generateQuestions(notes: string): Promise<string[]> {
   });
 
   if (!response.ok) {
+    // Log detailed error server-side only
     const body = await response.text().catch(() => "");
-    throw new Error(
-      `Claude API error (${response.status}): ${body || response.statusText}`,
-    );
+    console.error(`Claude API error (${response.status}):`, body);
+
+    // Throw generic error (don't expose API details to client)
+    throw new Error("AI service temporarily unavailable. Please try again.");
   }
 
   const message = (await response.json()) as {
@@ -289,10 +291,12 @@ export async function evaluateAnswer(
   });
 
   if (!response.ok) {
+    // Log detailed error server-side only
     const body = await response.text().catch(() => "");
-    throw new Error(
-      `Claude API error (${response.status}): ${body || response.statusText}`,
-    );
+    console.error(`Claude API error (${response.status}):`, body);
+
+    // Throw generic error (don't expose API details to client)
+    throw new Error("AI service temporarily unavailable. Please try again.");
   }
 
   const message = (await response.json()) as {
