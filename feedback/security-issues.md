@@ -6,11 +6,11 @@ These security issues were identified through code review (Codex security audit)
 
 | #   | Issue title                                                 | Priority  | GitHub link                                                  | Status |
 | --- | ----------------------------------------------------------- | --------- | ------------------------------------------------------------ | ------ |
-| 19  | Security: Restrict CORS to allowed origins                  | High      | [#19](https://github.com/sandarma/Interview-Coach-AI/issues/19) | Fixed  |
-| 20  | Security: Add rate limiting to all API routes               | High      | [#20](https://github.com/sandarma/Interview-Coach-AI/issues/20) | Fixed  |
-| 21  | Security: Sanitize error messages                           | Medium    | [#21](https://github.com/sandarma/Interview-Coach-AI/issues/21) | Fixed  |
-| 22  | Security: Add input validation to all routes                | Medium    | [#22](https://github.com/sandarma/Interview-Coach-AI/issues/22) | Fixed  |
-| 23  | Security: Remove client-supplied notes from evaluate endpoint | Medium  | [#23](https://github.com/sandarma/Interview-Coach-AI/issues/23) | Fixed  |
+| 19  | Security: Restrict CORS to allowed origins                  | High      | [#19](https://github.com/sandarma/Interview-Coach-AI/issues/19) | Closed |
+| 20  | Security: Add rate limiting to all API routes               | High      | [#20](https://github.com/sandarma/Interview-Coach-AI/issues/20) | Closed |
+| 21  | Security: Sanitize error messages                           | Medium    | [#21](https://github.com/sandarma/Interview-Coach-AI/issues/21) | Closed |
+| 22  | Security: Add input validation to all routes                | Medium    | [#22](https://github.com/sandarma/Interview-Coach-AI/issues/22) | Closed |
+| 23  | Security: Remove client-supplied notes from evaluate endpoint | Medium  | [#23](https://github.com/sandarma/Interview-Coach-AI/issues/23) | Closed |
 
 ## Security Findings from Codex Audit
 
@@ -57,4 +57,4 @@ These security issues were identified through code review (Codex security audit)
 
 ## Status
 
-✅ All security issues fixed — Ready for review and push
+✅ All security issues fixed and closed on GitHub
