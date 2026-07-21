@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 import dotenv from "dotenv";
 import rateLimit from "express-rate-limit";
 import { evaluateRouter } from "./routes/evaluate.js";
@@ -9,6 +10,9 @@ dotenv.config({ override: true });
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// ── Trust Proxy (for rate limiting behind Render's load balancer) ──────────
+app.set("trust proxy", 1);
 
 // ── CORS Configuration ─────────────────────────────────────────────────────
 // Restrict CORS to deployed frontend origin in production
@@ -29,6 +33,9 @@ app.use(
     credentials: true,
   }),
 );
+
+// ── Security Headers (helmet) ─────────────────────────────────────────────
+app.use(helmet());
 
 // ── Body Parser with Size Limit ────────────────────────────────────────────
 app.use(express.json({ limit: "10kb" }));

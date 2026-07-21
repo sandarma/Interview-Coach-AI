@@ -22,7 +22,8 @@
       "Bash(python3 -c ' *)",
       "Bash(node *)",
       "Bash(npx tsc *)",
-      "mcp__filesystem__read_multiple_files"
+      "mcp__filesystem__read_multiple_files",
+      "Bash(claude plugin *)"
     ],
     "deny": [
       "Read(./node_modules/**)",

@@ -15,7 +15,8 @@
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
     "express-rate-limit": "^8.5.2",
-    "googleapis": "^173.0.0"
+    "googleapis": "^173.0.0",
+    "helmet": "^8.3.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
