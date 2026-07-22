@@ -8,11 +8,61 @@ interface EvaluateRequestBody {
   topic: string;
   question: string;
   answer: string;
+  recaptchaToken?: string;
+}
+
+// ── reCAPTCHA Verification ────────────────────────────────────────────────
+const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
+const RECAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
+const RECAPTCHA_SCORE_THRESHOLD = 0.5;
+
+async function verifyRecaptcha(token: string): Promise<boolean> {
+  // If no secret key configured, skip verification (development mode)
+  if (!RECAPTCHA_SECRET_KEY) {
+    console.warn("RECAPTCHA_SECRET_KEY not configured, skipping verification");
+    return true;
+  }
+
+  try {
+    const response = await fetch(RECAPTCHA_VERIFY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        secret: RECAPTCHA_SECRET_KEY,
+        response: token,
+      }),
+    });
+
+    const data = await response.json();
+
+    // Score: 0.0 = bot, 1.0 = human
+    if (data.success && data.score >= RECAPTCHA_SCORE_THRESHOLD) {
+      return true;
+    }
+
+    console.warn(`reCAPTCHA verification failed: score=${data.score}, success=${data.success}`);
+    return false;
+  } catch (error) {
+    console.error("reCAPTCHA verification error:", error);
+    // On error, allow the request (fail open for UX)
+    return true;
+  }
 }
 
 evaluateRouter.post("/evaluate", async (req: Request, res: Response) => {
   try {
-    const { topic, question, answer } = req.body as EvaluateRequestBody;
+    const { topic, question, answer, recaptchaToken } = req.body as EvaluateRequestBody;
+
+    // ── reCAPTCHA Validation ─────────────────────────────────────────────
+    if (recaptchaToken) {
+      const isValid = await verifyRecaptcha(recaptchaToken);
+      if (!isValid) {
+        res.status(403).json({
+          error: "Security verification failed. Please try again.",
+        });
+        return;
+      }
+    }
 
     // ── Input Validation ──────────────────────────────────────────────────
     // Type checks
