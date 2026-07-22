@@ -26,7 +26,7 @@ app.use(
       // In production, reject null origin (prevents curl/script bypass)
       if (!origin) {
         if (process.env.NODE_ENV === "production") {
-          return callback(new Error("Not allowed by CORS"));
+          return callback(null, false);
         }
         // Allow null origin in development (for curl, Postman, etc.)
         return callback(null, true);
@@ -34,7 +34,7 @@ app.use(
       if (ALLOWED_ORIGINS.includes(origin)) {
         return callback(null, true);
       }
-      return callback(new Error("Not allowed by CORS"));
+      return callback(null, false); // Reject with 403 instead of 500
     },
     credentials: true,
   }),
