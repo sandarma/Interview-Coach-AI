@@ -83,7 +83,8 @@ const WelcomeScreen = ({ onSelectTopic }: WelcomeScreenProps) => {
                   key={topic}
                   type="button"
                   onClick={() => onSelectTopic(topic)}
-                  className="group flex flex-col items-center gap-3 rounded-2xl border border-gray-200 bg-white px-5 py-6 shadow-sm transition hover:border-blue-300 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-100"
+                  aria-label={`Practice ${topic} interview questions`}
+                  className="group flex cursor-pointer flex-col items-center gap-3 rounded-2xl border border-gray-200 bg-white px-5 py-6 shadow-sm transition hover:border-blue-300 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-100"
                 >
                   <span className="text-3xl">📝</span>
                   <span className="text-sm font-semibold text-gray-700 group-hover:text-blue-600">
