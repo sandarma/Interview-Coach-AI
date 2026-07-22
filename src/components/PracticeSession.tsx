@@ -1,6 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { evaluateAnswer, type EvaluationResult } from "../services/evaluateApi";
 import { fetchQuestion } from "../services/questionApi";
+
+const RECAPTCHA_ENABLED = !!import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+
+// Type for Google reCAPTCHA v3 global object
+declare global {
+  interface Window {
+    grecaptcha?: {
+      execute: (siteKey: string, options: { action: string }) => Promise<string>;
+      ready: (callback: () => void) => void;
+    };
+  }
+}
 
 type Phase = "answering" | "loading" | "evaluating" | "error" | "complete";
 
@@ -98,6 +110,19 @@ const PracticeSession = ({ topic, onBackToWelcome }: PracticeSessionProps) => {
   const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
 
+  // Get reCAPTCHA token (uses global grecaptcha injected by GoogleReCaptchaProvider)
+  const getRecaptchaToken = useCallback(async (action: string): Promise<string | null> => {
+    if (!RECAPTCHA_ENABLED || !window.grecaptcha?.execute) return null;
+    const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+    if (!siteKey) return null;
+    try {
+      return await window.grecaptcha.execute(siteKey, { action });
+    } catch {
+      console.warn("reCAPTCHA execution failed");
+      return null;
+    }
+  }, []);
+
   const questionNumber = currentQuestionIndex + 1;
 
   // ── Load question from API ───────────────────────────────────────────────
@@ -137,7 +162,10 @@ const PracticeSession = ({ topic, onBackToWelcome }: PracticeSessionProps) => {
     setErrorMessage("");
 
     try {
-      const result = await evaluateAnswer(topic, currentQuestion, answer);
+      // Get reCAPTCHA token if configured
+      const recaptchaToken = await getRecaptchaToken("evaluate_answer");
+
+      const result = await evaluateAnswer(topic, currentQuestion, answer, recaptchaToken);
       setEvaluation(result);
       setPhase("evaluating");
     } catch (err) {
