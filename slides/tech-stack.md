@@ -143,6 +143,35 @@ Output
 
 ---
 
+# Trigger
+
+## What triggers the agent?
+
+| User action | Agent response |
+|-------------|----------------|
+| Selects a topic | Fetches notes from Google Sheets, generates 10 questions via Claude |
+| Submits an answer | Evaluates answer, scores 3 dimensions, creates coaching feedback |
+| Requests follow-up | Generates next question based on current weakness |
+| Clicks "Try Again" | Reloads topics from API |
+| Loads the page | Fetches available topics from Google Sheets |
+
+---
+
+# Commands
+
+## Available skills & endpoints
+
+| Command / Skill | Purpose |
+|----------------|---------|
+| `evaluate-answer` | Evaluate a submitted answer — returns scores, feedback, improved answer |
+| `generate-questions` | Generate 10 interview questions from study notes |
+| `POST /api/evaluate` | Submit an answer for evaluation (passes `recaptchaToken`) |
+| `POST /api/question` | Get a question for a given topic and index |
+| `GET /api/topics` | List available interview topics |
+| `GET /api/health` | Health check endpoint |
+
+---
+
 # Methodology
 
 ```text

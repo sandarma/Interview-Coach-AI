@@ -66,6 +66,15 @@ Understanding over memorisation.
 
 # How I built it
 
+### Agent
+
+**Interview Coach Agent** — a single agent combining 4 roles:
+
+- Question Generator
+- Answer Evaluator
+- Coaching Feedback
+- Study Planner
+
 ### Skills
 
 Evaluate Answer + Generate Questions
@@ -74,6 +83,22 @@ Evaluate Answer + Generate Questions
 - Identifies missing concepts
 - Creates coaching feedback
 - Generates 10 questions from study notes
+
+### Triggers
+
+| Action | Response |
+|--------|----------|
+| Select topic → | Generate 10 questions from Google Sheets notes |
+| Submit answer → | Evaluate and return coaching feedback |
+| Request next → | Follow-up question based on current weakness |
+
+### Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/api/evaluate` | Evaluate an answer |
+| `/api/question` | Get a question |
+| `/api/topics` | List available topics |
 
 ### RAG Pipeline
 
@@ -85,7 +110,7 @@ Google Sheets → Claude API
 
 ### Tech Stack
 
-React + Express + Claude API + Google Sheets
+See [slides/tech-stack.html](slides/tech-stack.html) for details.
 
 ---
 
