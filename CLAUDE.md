@@ -56,6 +56,85 @@ When generating code:
 
 ---
 
+## Security
+
+### reCAPTCHA v3
+
+- Backend verifies tokens via `https://www.google.com/recaptcha/api/siteverify`.
+- Uses invisible scoring (0.0 = bot, 1.0 = human) with threshold 0.5.
+- Token is fetched client-side via `window.grecaptcha.execute()` and sent in the request body.
+- Fail-open: if reCAPTCHA is unreachable, the request is still allowed for UX reasons.
+
+### Input Validation
+
+All routes validate input types, lengths, and required fields:
+
+| Route      | Validations                                                                 |
+| ---------- | --------------------------------------------------------------------------- |
+| `/api/evaluate` | Type checks, trim checks, length limits (topic ≤100, question ≤1000, answer ≤1000), topic validated against Google Sheets |
+| `/api/question` | Type checks, length limits, questionIndex validated (non-negative integer, ≤100) |
+
+### Rate Limiting
+
+- **Global**: 100 requests/hour per IP.
+- **Evaluate**: 10 requests/hour per IP.
+- **Question**: 30 requests/hour per IP.
+- **Topics**: 20 requests/hour per IP.
+- All rate limiters return proper `Retry-After` headers.
+
+### CORS
+
+- Restricted to `ALLOWED_ORIGINS` environment variable (comma-separated).
+- Null origin rejected in production (prevents curl/script bypass).
+- Disallowed origins return 403 (not 500) via `callback(null, false)`.
+
+### Other Security Headers
+
+- **helmet**: Sets security headers (X-Content-Type-Options, X-Frame-Options, etc.).
+- **trust proxy**: Enabled for Render load balancer.
+- **Body size limit**: `express.json({ limit: "10kb" })`.
+- **Error sanitization**: Detailed errors logged server-side; generic messages returned to client.
+
+---
+
+## Plugins
+
+The project has been audited using the following plugins:
+
+| Plugin | Skills |
+|--------|--------|
+| `vibecode@litellm` | `code-review`, `security-review`, `pitch-coach` |
+
+These plugins performed:
+- **Code review**: 8-finder-angle analysis with 10 adversarial verifier agents
+- **Security review**: Comprehensive audit with OWASP-recommended findings
+- **Pitch coach**: Generated a 2-minute project pitch
+
+---
+
+## Environment Variables
+
+### Frontend (`.env` / Vercel)
+
+```text
+VITE_API_URL=https://your-backend.onrender.com
+VITE_RECAPTCHA_SITE_KEY=your-recaptcha-site-key
+```
+
+### Backend (`backend/.env` / Render)
+
+```text
+PORT=3001
+ANTHROPIC_API_KEY=your-anthropic-api-key
+GOOGLE_SHEET_ID=your-google-sheet-id
+CLIENT_SERVICE_ACCOUNT_EMAIL=your-service-account@project.iam.gserviceaccount.com
+CLIENT_SERVICE_ACCOUNT_KEY=your-private-key
+ALLOWED_ORIGINS=https://your-frontend.vercel.app,http://localhost:5173
+RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
+```
+
+---
+
 ## Agent
 
 ### Interview Coach Agent
@@ -220,6 +299,8 @@ Current implementation:
 - One Agent: Interview Coach Agent
 - Two Skills: Evaluate Answer, Generate Questions
 - One Knowledge Source: Google Sheets via `googleapis`
+- Security: reCAPTCHA v3, helmet, CORS, rate limiting, input validation
+- Plugins: vibecode@litellm (code-review, security-review, pitch-coach)
 
 Future versions may introduce:
 
