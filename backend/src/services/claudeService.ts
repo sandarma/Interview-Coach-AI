@@ -106,7 +106,7 @@ function buildUserMessage(
 }
 
 function getApiKey(): string {
-  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
+  const apiKey = process.env.ANTHROPIC_API_KEY;
 
   if (!apiKey || apiKey === "your-api-key-here") {
     throw new Error(
