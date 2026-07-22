@@ -84,8 +84,14 @@ After each answer, Claude provides:
 
 ### Security
 
-- Prompt injection protection — user answers are wrapped in delimiters
-- Claude is instructed to never reveal system prompts or internal details
+- **Prompt injection protection** — user answers are wrapped in delimiters
+- **Claude is instructed** to never reveal system prompts or internal details
+- **reCAPTCHA v3** — invisible bot detection on evaluate endpoint
+- **CORS** — restricted to allowed origins only
+- **Rate limiting** — per-IP limits (100/hr global, 10/hr evaluate)
+- **Helmet** — security headers (X-Content-Type-Options, X-Frame-Options, etc.)
+- **Input validation** — type, length, and topic validation on all routes
+- **Error sanitization** — detailed logs server-side, generic messages to client
 
 ---
 
@@ -146,10 +152,19 @@ After each answer, Claude provides:
 - Google Sheets (via `googleapis` npm package)
 - In-memory caching (10 min for questions, 1 hour for topics)
 
-### Deployment
+### Security Add-ons
 
-- Vercel (Frontend)
-- Render (Backend)
+- **reCAPTCHA v3** — invisible bot protection (Google reCAPTCHA)
+- **Helmet** — secure HTTP headers
+- **Rate limiting** — express-rate-limit per endpoint
+- **CORS** — origin-based access control
+
+### DevOps / Tooling
+
+- **Plugins**: vibecode@litellm (code-review, security-review, pitch-coach)
+- **Chrome DevTools MCP** — screenshot and testing tool
+- **Vercel** — Frontend deployment
+- **Render** — Backend deployment
 
 ---
 
@@ -203,6 +218,8 @@ ANTHROPIC_API_KEY=your-anthropic-api-key
 GOOGLE_SHEET_ID=your-google-sheet-id
 CLIENT_SERVICE_ACCOUNT_EMAIL=your-service-account@project.iam.gserviceaccount.com
 CLIENT_SERVICE_ACCOUNT_KEY=your-private-key
+ALLOWED_ORIGINS=http://localhost:5173,https://your-frontend.vercel.app
+RECAPTCHA_SECRET_KEY=your-recaptcha-secret-key
 ```
 
 Start the backend server:
@@ -284,9 +301,26 @@ What happens when the dependency array is empty?
 | Method | Endpoint        | Description                                      |
 | ------ | --------------- | ------------------------------------------------ |
 | `POST` | `/api/question` | Get a question (`{topic, questionIndex}`)        |
-| `POST` | `/api/evaluate` | Evaluate an answer (`{topic, question, answer}`) |
+| `POST` | `/api/evaluate` | Evaluate an answer (`{topic, question, answer, recaptchaToken}`) |
 | `GET`  | `/api/topics`   | List available topics                            |
 | `GET`  | `/api/health`   | Health check                                     |
+
+### reCAPTCHA Setup
+
+1. Go to [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin)
+2. Register v3 (invisible) — use bare domain names, not full URLs
+3. Add **Site Key** to root `.env` as `VITE_RECAPTCHA_SITE_KEY` and Vercel
+4. Add **Secret Key** to `backend/.env` as `RECAPTCHA_SECRET_KEY` and Render
+
+---
+
+## Plugins
+
+This project uses the `vibecode@litellm` plugin for development quality checks:
+
+- **code-review** — Multi-angle code review with adversarial verification
+- **security-review** — OWASP-based security audit
+- **pitch-coach** — Automated project pitch generation
 
 ---
 
