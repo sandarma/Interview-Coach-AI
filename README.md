@@ -145,6 +145,7 @@ After each answer, Claude provides:
 ### AI
 
 - Claude API (claude-sonnet-4-6)
+- One Agent: `interview-coach`
 - Two skills: `evaluate-answer`, `generate-questions`
 
 ### Knowledge Source
@@ -250,6 +251,15 @@ Interview Notes
 
 Each tab should have interview notes in column B (starting from row 2).
 
+| Topic        | Question                                                        | Explaination                                                                                         |
+| ------------ | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| React-Basics | Q. What is Virtual DOM? Difference between DOM and Virtual DOM? | React uses a virtual DOM to efficiently update the UI without re-render the entire page, which helps |
+
+improve performance and make the application more responsive. The virtual DOM is a simplified version of the actual DOM used by React. It allows for efficient UI updates
+by comparing the virtual DOM to the real DOM and making only the necessary changes through a process
+known as reconciliation. |
+| Components - Functional/ Class | Q. What is Prop Drilling in React? | Prop drilling is the process of passing down props through multiple layers of components. |
+
 ---
 
 ## Example Scenario
@@ -298,12 +308,12 @@ What happens when the dependency array is empty?
 
 ## API Endpoints
 
-| Method | Endpoint        | Description                                      |
-| ------ | --------------- | ------------------------------------------------ |
-| `POST` | `/api/question` | Get a question (`{topic, questionIndex}`)        |
+| Method | Endpoint        | Description                                                      |
+| ------ | --------------- | ---------------------------------------------------------------- |
+| `POST` | `/api/question` | Get a question (`{topic, questionIndex}`)                        |
 | `POST` | `/api/evaluate` | Evaluate an answer (`{topic, question, answer, recaptchaToken}`) |
-| `GET`  | `/api/topics`   | List available topics                            |
-| `GET`  | `/api/health`   | Health check                                     |
+| `GET`  | `/api/topics`   | List available topics                                            |
+| `GET`  | `/api/health`   | Health check                                                     |
 
 ### reCAPTCHA Setup
 

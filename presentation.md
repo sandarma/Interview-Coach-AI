@@ -86,19 +86,19 @@ Evaluate Answer + Generate Questions
 
 ### Triggers
 
-| Action | Response |
-|--------|----------|
-| Select topic → | Generate 10 questions from Google Sheets notes |
-| Submit answer → | Evaluate and return coaching feedback |
-| Request next → | Follow-up question based on current weakness |
+| Action          | Response                                       |
+| --------------- | ---------------------------------------------- |
+| Select topic →  | Generate 10 questions from Google Sheets notes |
+| Submit answer → | Evaluate and return coaching feedback          |
+| Request next →  | Follow-up question based on current weakness   |
 
 ### Commands
 
-| Command | Purpose |
-|---------|---------|
-| `/api/evaluate` | Evaluate an answer |
-| `/api/question` | Get a question |
-| `/api/topics` | List available topics |
+| Command         | Purpose               |
+| --------------- | --------------------- |
+| `/api/evaluate` | Evaluate an answer    |
+| `/api/question` | Get a question        |
+| `/api/topics`   | List available topics |
 
 ### RAG Pipeline
 
@@ -134,6 +134,7 @@ The goal is to help developers explain concepts clearly in real interviews.
 # Done checklist
 
 - [x] Repo public
+- [x] One agent implement (interview coach)
 - [x] Two skills implemented (evaluate + generate)
 - [x] React frontend with topic selection
 - [x] Express backend with 3 endpoints
